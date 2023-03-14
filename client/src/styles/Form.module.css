@@ -1,0 +1,39 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  padding: 0.62rem;
+  border-radius: 0.32rem;
+  color: hsl(204, 100%, 49%);
+  font-weight: bold;
+  box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.08);
+}
+
+.form > label {
+  margin-top: 0.12rem;
+  margin-bottom: 0.12rem;
+}
+
+.form > input {
+  margin-top: 0.12rem;
+}
+
+.form > input[type="submit"] {
+  background: hsl(204, 100%, 49%);
+  color: hsl(0, 0%, 100%);
+  padding: 0.12rem;
+  margin-top: 0.32rem;
+  font-weight: bold;
+  border: 0;
+  border-radius: 0.12rem;
+}
+
+.form > input[type="submit"]:hover {
+  cursor: pointer;
+  background: hsl(204, 100%, 38%);
+}
+
+.error-text {
+  font-weight: normal;
+  color: red;
+  margin-top: 0.12rem;
+}

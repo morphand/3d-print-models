@@ -1,0 +1,100 @@
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 3rem;
+  padding: 1rem;
+  background: hsl(0, 0%, 96%);
+  box-shadow: 0px 0px 0.12rem 0.06rem rgba(0, 0, 0, 0.35);
+}
+
+.nav > div > ul {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.nav > div > ul > li {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.nav > div > ul > li > a {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav
+  > div
+  > ul
+  > li[class="nav-right-profile-link"]
+  > div[class="nav-right-profile-link-username"] {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  font-weight: normal;
+  color: hsl(204, 100%, 41%);
+  font-style: italic;
+}
+
+.nav
+  > div
+  > ul
+  > li[class="nav-right-profile-link"]
+  > div[class="nav-right-profile-link-username"]
+  > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav
+  > div
+  > ul
+  > li[class="nav-right-profile-link"]
+  > div[class="nav-right-profile-link-username"]
+  > div
+  > svg {
+  width: 1rem;
+  height: 1rem;
+  fill: hsl(204, 100%, 41%);
+  cursor: pointer;
+}
+
+.nav
+  > div
+  > ul
+  > li[class="nav-right-profile-link"]
+  > div
+  > div[class="nav-right-profile-link-dropdown"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  top: 2rem;
+  background: hsl(0, 0%, 96%);
+  width: 12rem;
+  border: 1px solid lightgray;
+  z-index: 999;
+}
+
+.nav
+  > div
+  > ul
+  > li[class="nav-right-profile-link"]
+  > div
+  > div[class="nav-right-profile-link-dropdown"]
+  > a {
+  text-decoration: none;
+  width: 100%;
+  text-align: center;
+}

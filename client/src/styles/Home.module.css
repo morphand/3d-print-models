@@ -1,0 +1,77 @@
+.hero {
+  display: flex;
+  background: hsl(204, 100%, 49%);
+  border-radius: 1.32rem;
+  min-height: 22vh;
+}
+
+.hero > div[class="hero-left"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  color: hsl(0, 0%, 100%);
+  width: 50%;
+  font-size: 2.12rem;
+  padding: 3rem;
+}
+
+.hero > div[class="hero-left"] > p > span {
+  font-weight: bold;
+}
+
+.hero > div[class="hero-left"] > p > small[class="hero-left-links"] {
+  font-size: 0.88rem;
+}
+
+.hero > div[class="hero-left"] > p > small[class="hero-left-links"] > a {
+  color: white;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.hero > div[class="hero-right"] {
+  display: flex;
+  background: hsl(204, 100%, 28%);
+  width: 50%;
+  padding: 3rem;
+}
+
+article[class="featured"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.featured-models {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.featured-models div[class="featured-model"] {
+  background: gray;
+  width: 25%;
+}
+
+.featured-models div[class="featured-model-head"] {
+  background: red;
+}
+
+.featured-models div[class="featured-model-uploaded-by"] {
+  background: green;
+}
+
+.featured-models div[class="featured-model-statistics"] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: coral;
+}
+
+.featured-models div[class="featured-model-statistics"] > span > svg {
+  width: 1.32rem;
+  height: 1.32rem;
+}
