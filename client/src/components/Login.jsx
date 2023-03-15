@@ -27,7 +27,7 @@ function Login() {
     if (!areValidLoginDetails.status) {
       return areValidLoginDetails.errors.forEach((e) => console.error(e));
     }
-    fetch("http://localhost:5000/", {
+    fetch("http://localhost:5000/login", {
       method: "POST",
       body: JSON.stringify(req),
       headers: {
