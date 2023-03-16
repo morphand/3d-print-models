@@ -9,12 +9,12 @@ import Footer from "./components/Footer";
 function App() {
   // token: { _id: '1234', username: 'user' }
   let token = localStorage.getItem("auth");
-  if (!token) {
-    token = {
-      _id: 1234,
-      username: "user",
-    };
-  }
+  // if (!token) {
+  //   token = {
+  //     _id: 1234,
+  //     username: "user",
+  //   };
+  // }
   const isUserLoggedIn = token ? true : false;
   console.log(token);
   return (

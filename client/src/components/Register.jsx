@@ -14,8 +14,9 @@ import {
   validateRepeatPassword,
 } from "../utils/validators";
 import styles from "../styles/Form.module.css";
+import { useNavigate } from "react-router-dom";
 
-function Register() {
+function Register({ setToken }) {
   const username = useRef("");
   const email = useRef("");
   const password = useRef("");
@@ -24,6 +25,7 @@ function Register() {
   const [isValidPassword, setIsValidPassword] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [isValidRepeatPassword, setIsValidRepeatPassword] = useState(false);
+  const navigate = useNavigate();
 
   function handleRegister(e) {
     e.preventDefault();
@@ -35,6 +37,28 @@ function Register() {
       password.current.value,
       repeatPassword.current.value
     );
+    // add validation
+    const req = {
+      username: username.current.value.trim(),
+      email: email.current.value.trim(),
+      password: password.current.value.trim(),
+      repeatPassword: repeatPassword.current.value.trim(),
+    };
+    fetch("http://localhost:5000/register", {
+      method: "POST",
+      body: JSON.stringify(req),
+      headers: {
+        "Content-type": "application/json",
+      },
+    })
+      .then((data) => data.json())
+      .then((data) => {
+        console.log(data);
+        console.log(data.status);
+        console.log(data.errors);
+        console.log(data.value);
+      })
+      .catch((e) => console.error(e));
   }
 
   return (
