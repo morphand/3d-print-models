@@ -1,21 +1,30 @@
+// Core modules
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
+// Controllers
+const loginController = require("./controllers/login");
+const registerController = require("./controllers/register");
+
+const constants = require("./constants");
+
+// Init
 const app = express();
 
-const PORT = 5000;
-
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}.`);
+mongoose.connect(`mongodb://127.0.0.1/${constants.DB_NAME}`).then(() => {
+  console.log(`Connected to database ${constants.DB_NAME}.`);
+  app.listen(constants.PORT, () => {
+    console.log(`Server listening on port ${constants.PORT}.`);
+  });
 });
 
-app.post("/", (req, res) => {
-  console.log(`/`, req.body);
-  const result = {
-    res: req.body,
-  };
-  return res.json(JSON.stringify(result));
-});
+// Login
+app.post("/login", loginController);
+
+// Register
+app.post("/register", registerController);
