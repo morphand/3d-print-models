@@ -17,9 +17,3 @@
   align-items: center;
   border-bottom: 0.12rem solid gray;
 }
-
-.toast-header-close {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}

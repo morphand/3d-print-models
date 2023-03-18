@@ -1,18 +1,24 @@
+import { useState, useEffect } from "react";
 import styles from "../styles/Toast.module.css";
 
-function Toast({ header, content }) {
+function Toast({ header, content, hideAfterMs = 3000 }) {
+  const [isShown, setIsShown] = useState(true);
+  setTimeout(() => {
+    setIsShown(false);
+  }, hideAfterMs);
   return (
-    <div className={styles["toast"]}>
-      <div className={styles["toast-header"]}>
-        <p>{header}</p>
-        <div className={styles["toast-header-close"]}>
-            <small>Close</small>
+    isShown && (
+      <div className={styles["toast"]}>
+        <div className={styles["toast-header"]}>
+          <p>{header}</p>
+        </div>
+        <div className="toast-content">
+          <p>
+            <small>{content}</small>
+          </p>
         </div>
       </div>
-      <div className="toast-content">
-        <p><small>{content}</small></p>
-      </div>
-    </div>
+    )
   );
 }
 
