@@ -1,10 +1,19 @@
 const mongoose = require("mongoose");
 
-// comment creator
-// model commented
-// date
-
-const CommentSchema = mongoose.Schema({});
+const CommentSchema = mongoose.Schema({
+  creatorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  modelCommented: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Model",
+  },
+  date: {
+    type: Date,
+    default: new Date(),
+  },
+});
 
 const CommentModel = mongoose.model("Comment", CommentSchema);
 

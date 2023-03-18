@@ -16,11 +16,7 @@ const UserSchema = mongoose.Schema({
         const regex = new RegExp(
           /^(?<address>[A-Za-z0-9_]{2,})@(?<subdomainOne>[A-Za-z0-9]{2,}\.)?(?<subdomainTwo>[A-Za-z0-9]{2,}\.)?(?<hostname>[A-Za-z0-9]{2,})\.(?<domain>[A-Za-z0-9]{2,})$/
         );
-        return (
-          e.length >= 6 &&
-          e.length <= 256 &&
-          regex.test(e)
-        );
+        return e.length >= 6 && e.length <= 256 && regex.test(e);
       },
     },
   },
@@ -28,6 +24,28 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  registeredAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  uploadedModels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Model",
+    },
+  ],
+  likedModels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Model",
+    },
+  ],
+  subscribers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 const UserModel = mongoose.model("User", UserSchema);
