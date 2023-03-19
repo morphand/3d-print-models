@@ -9,7 +9,6 @@ import Profile from "./components/Profile";
 import Footer from "./components/Footer";
 
 function App() {
-  // token: { _id: '1234', username: 'user' }
   const [token, setToken] = useState(localStorage.getItem("auth"));
   const decodedToken = useJwt(token).decodedToken;
   const [_id, set_id] = useState("");
@@ -20,12 +19,6 @@ function App() {
       setUsername(decodedToken.username);
     }
   }, [decodedToken]);
-  // if (!token) {
-  //   token = {
-  //     _id: 1234,
-  //     username: "user",
-  //   };
-  // }
   const isUserLoggedIn = token ? true : false;
   return (
     <div className="App">
