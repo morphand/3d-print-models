@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 // Controllers
 const loginController = require("./controllers/login");
 const registerController = require("./controllers/register");
+const userController = require("./controllers/user");
 
 const constants = require("./constants");
 
@@ -28,3 +29,6 @@ app.post("/login", loginController);
 
 // Register
 app.post("/register", registerController);
+
+// User API endpoint
+app.get("/api/user/:id", userController);
