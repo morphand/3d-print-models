@@ -8,7 +8,7 @@ import {
   validateLoginDetails,
 } from "../utils/validators";
 
-function Login() {
+function Login({ setToken }) {
   const username = useRef("");
   const password = useRef("");
   const [isValidUsername, setIsValidUsername] = useState(false);
@@ -35,54 +35,60 @@ function Login() {
       },
     })
       .then((data) => data.json())
-      .then((data) => console.log(data))
+      .then((result) => {
+        console.log(result);
+        if (result.status) {
+          localStorage.setItem("auth", result.value.token);
+          setToken(result.value.token);
+        }
+      })
       .catch((e) => console.error(e));
   }
 
   return (
-      <form className={styles["form"]} onSubmit={handleLogin}>
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          ref={username}
-          onChange={(e) => {
-            validateUsername(e.target.value)
-              ? setIsValidUsername(true)
-              : setIsValidUsername(false);
-          }}
-          required
-        />
-        {!isValidUsername && (
-          <p className={styles["error-text"]}>
-            <small>
-              Username should be atleast {USERNAME_MIN_LENGTH} characters long.
-            </small>
-          </p>
-        )}
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          ref={password}
-          onChange={(e) => {
-            validatePassword(e.target.value)
-              ? setIsValidPassword(true)
-              : setIsValidPassword(false);
-          }}
-          required
-        />
-        {!isValidPassword && (
-          <p className={styles["error-text"]}>
-            <small>
-              Password should be atleast {PASSWORD_MIN_LENGTH} characters long.
-            </small>
-          </p>
-        )}
-        <input type="submit" value="Login" />
-      </form>
+    <form className={styles["form"]} onSubmit={handleLogin}>
+      <label htmlFor="username">Username</label>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        ref={username}
+        onChange={(e) => {
+          validateUsername(e.target.value)
+            ? setIsValidUsername(true)
+            : setIsValidUsername(false);
+        }}
+        required
+      />
+      {!isValidUsername && (
+        <p className={styles["error-text"]}>
+          <small>
+            Username should be atleast {USERNAME_MIN_LENGTH} characters long.
+          </small>
+        </p>
+      )}
+      <label htmlFor="password">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        ref={password}
+        onChange={(e) => {
+          validatePassword(e.target.value)
+            ? setIsValidPassword(true)
+            : setIsValidPassword(false);
+        }}
+        required
+      />
+      {!isValidPassword && (
+        <p className={styles["error-text"]}>
+          <small>
+            Password should be atleast {PASSWORD_MIN_LENGTH} characters long.
+          </small>
+        </p>
+      )}
+      <input type="submit" value="Login" />
+    </form>
   );
 }
 

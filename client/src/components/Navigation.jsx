@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../styles/Navigation.module.css";
 
-function Navigation({ isUserLoggedIn, token }) {
+function Navigation({ isUserLoggedIn, _id, username, setToken }) {
   const [isProfileDropdownActive, setIsProfileDropdownActive] = useState(false);
+  function Logout() {
+    localStorage.clear();
+    setToken(null);
+  }
   return (
     <nav className={styles["nav"]}>
       <div className="nav-left">
@@ -36,9 +40,8 @@ function Navigation({ isUserLoggedIn, token }) {
           <ul>
             {/* Logged in navigation */}
             <li className="nav-right-profile-link">
-              {/* <Link to={`/profile/${token._id}`}>{token.username}</Link> */}
               <div className="nav-right-profile-link-username">
-                {token.username}
+                {username}
                 <div
                   onClick={(e) => {
                     e.preventDefault();
@@ -89,8 +92,10 @@ function Navigation({ isUserLoggedIn, token }) {
                 </div>
                 {isProfileDropdownActive && (
                   <div className="nav-right-profile-link-dropdown">
-                    <Link to={`/profile/${token._id}`}>Profile</Link>
-                    <Link to={`/logout`}>Logout</Link>
+                    <Link to={`/profile/${_id}`}>Profile</Link>
+                    <Link to={`/`} onClick={Logout}>
+                      Logout
+                    </Link>
                   </div>
                 )}
               </div>
