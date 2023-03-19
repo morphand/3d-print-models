@@ -1,11 +1,16 @@
+import { useEffect } from "react";
 import styles from "../styles/Profile.module.css";
 import { numberFormatter } from "../utils/formatters";
 
 function Profile() {
+  const user = {};
   const name = "name";
   const downloads = numberFormatter(0);
   const favourites = numberFormatter(0);
   const subscribers = numberFormatter(0);
+  useEffect(() => {
+    
+  })
   return (
     <div className={styles["profile-wrapper"]}>
       <div className={styles["profile-image"]}>
