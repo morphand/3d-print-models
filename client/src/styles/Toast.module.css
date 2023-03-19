@@ -1,0 +1,21 @@
+.toast {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  margin: 3rem;
+  padding: 0.32rem;
+  background: white;
+  min-width: 12rem;
+  border-radius: 0.32rem;
+  max-width: 22rem;
+  border: 0.12rem solid lightgray;
+  color: hsl(204, 100%, 38%);
+}
+
+.toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.12rem solid gray;
+}
