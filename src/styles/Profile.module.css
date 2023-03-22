@@ -1,6 +1,6 @@
 .profile-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   padding: 0.32rem;
@@ -10,32 +10,46 @@
 }
 
 .profile-image > img {
-    width: 6rem;
-    height: 6rem;
-    border-radius: 100%;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 100%;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1.32rem;
 }
 
 .profile-statistics {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .profile-statistics > div {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-left: 0.32rem;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0.32rem;
 }
 
-.profile-statistics > div > svg {
-    width: 1.32rem;
-    height: 1.32rem;
+.profile-statistics div svg {
+  width: 1.32rem;
+  height: 1.32rem;
 }
 
 .profile-name {
-    font-size: 1.22rem;
-    margin-bottom: 0.32rem;
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.32rem; */
+  font-size: 1.22rem;
+  margin-bottom: 0.32rem;
+}
+
+.edit-profile-link {
+  font-size: 0.82rem;
 }
