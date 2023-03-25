@@ -4,6 +4,7 @@ import styles from "../styles/Form.module.css";
 function Upload({ userId }) {
   const [filesSelected, setFilesSelected] = useState(null);
   const modelName = useRef();
+  const modelDescription = useRef();
   function handleSubmit(e) {
     if (userId) {
       e.preventDefault();
@@ -13,6 +14,7 @@ function Upload({ userId }) {
         JSON.stringify({
           creatorId: userId,
           modelName: modelName.current.value,
+          modelDescription: modelDescription.current.value,
         })
       );
       [...filesSelected].forEach((file, i) =>
@@ -50,6 +52,7 @@ function Upload({ userId }) {
         <textarea
           name="modelDescription"
           id="modelDescription"
+          ref={modelDescription}
           cols="30"
           rows="10"
           placeholder="Describe your model here."
