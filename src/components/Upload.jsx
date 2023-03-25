@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "../styles/Form.module.css";
 
 function Upload({ userId }) {
   const [filesSelected, setFilesSelected] = useState(null);
+  const modelName = useRef();
   function handleSubmit(e) {
     if (userId) {
       e.preventDefault();
       const formData = new FormData();
+      formData.append(
+        "modelInfo",
+        JSON.stringify({
+          creatorId: userId,
+          modelName: modelName.current.value,
+        })
+      );
       [...filesSelected].forEach((file, i) =>
         formData.append(`file-${i}`, file, file.name)
       );
@@ -20,14 +28,33 @@ function Upload({ userId }) {
   }
   return (
     <div>
+      <h3>Upload model</h3>
       <form
         method="POST"
         encType="multipart/form-data"
         className={styles["form"]}
         onSubmit={(e) => handleSubmit(e)}
       >
-        <label htmlFor="modelName">Model name</label>
-        <input type="text" name="modelName" id="modelName" />
+        <label htmlFor="modelName">Name</label>
+        <input
+          type="text"
+          name="modelName"
+          id="modelName"
+          ref={modelName}
+          minLength="2"
+          maxLength="100"
+          placeholder="The name of your model."
+          required
+        />
+        <label htmlFor="modelDescription">Description</label>
+        <textarea
+          name="modelDescription"
+          id="modelDescription"
+          cols="30"
+          rows="10"
+          placeholder="Describe your model here."
+        ></textarea>
+        <label htmlFor="model">Files (allowed file formats: STL/OBJ/3MF)</label>
         <input
           type="file"
           name="model"
@@ -36,7 +63,7 @@ function Upload({ userId }) {
             setFilesSelected(e.target.files);
           }}
         />
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Upload" />
       </form>
     </div>
   );
