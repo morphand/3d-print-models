@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
 import Footer from "./components/Footer";
+import Upload from "./components/Upload";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("auth"));
@@ -38,6 +39,9 @@ function App() {
             <Route path="/login" element={<Login setToken={setToken} />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile/:userId" element={<Profile />} />
+            {isUserLoggedIn && (
+              <Route path="/upload" element={<Upload userId={_id} />} />
+            )}
             <Route path="*" element={<h1>404</h1>} />
           </Routes>
         </div>
