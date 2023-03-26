@@ -19,7 +19,7 @@ function Navigation({ isUserLoggedIn, _id, username, setToken }) {
             // Logged in navigation
             <>
               <li>
-                <Link to="/">Upload</Link>
+                <Link to="/upload">Upload</Link>
               </li>
             </>
           ) : (
