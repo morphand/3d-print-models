@@ -57,6 +57,7 @@ function Register({ setToken }) {
         console.log(data.status);
         console.log(data.errors);
         console.log(data.value);
+        navigate("/login");
       })
       .catch((e) => console.error(e));
   }
