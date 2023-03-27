@@ -12,8 +12,8 @@ import {
   validatePassword,
   validateEmail,
   validateRepeatPassword,
-} from "../utils/validators";
-import styles from "../styles/Form.module.css";
+} from "../../utils/validators";
+import styles from "../../styles/Form.module.css";
 import { useNavigate } from "react-router-dom";
 
 function Register({ setToken }) {

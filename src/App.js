@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useJwt } from "react-jwt";
-import Navigation from "./components/Navigation";
-import Home from "./components/Home";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import Navigation from "./components/Navigation/Navigation";
+import Home from "./components/Home/Home";
+import Login from "./components/Login/Login";
+import Register from "./components/Register/Register";
 import Profile from "./components/Profile/Profile";
-import Footer from "./components/Footer";
-import Upload from "./components/Upload";
-import Catalog from "./components/Catalog";
-import Model from "./components/Model";
+import Footer from "./components/Footer/Footer";
+import Upload from "./components/Upload/Upload";
+import Catalog from "./components/Catalog/Catalog";
+import Model from "./components/Model/Model";
 import EditProfile from "./components/Profile/EditProfile";
 
 function App() {

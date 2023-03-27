@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { DownloadIcon, LikesIcon, CommentsIcon } from "./Icons";
-import { numberFormatter } from "../utils/formatters";
+import { DownloadIcon, LikesIcon, CommentsIcon } from "../Icons/Icons";
+import { numberFormatter } from "../../utils/formatters";
 
 function ModelCard({ model }) {
   return (

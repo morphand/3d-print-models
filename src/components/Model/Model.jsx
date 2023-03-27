@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import Loading from "./Loading";
-import { DownloadIcon, LikesIcon, CommentsIcon, RibbonIcon } from "./Icons";
-import { numberFormatter } from "../utils/formatters";
-import styles from "../styles/Model.module.css";
+import { StlViewer } from "react-stl-viewer";
+import Loading from "../Loading/Loading";
+import { DownloadIcon, LikesIcon, CommentsIcon, RibbonIcon } from "../Icons/Icons";
+import { numberFormatter } from "../../utils/formatters";
+import styles from "../../styles/Model.module.css";
+import formStyles from "../../styles/Form.module.css";
 
 function Model() {
   const modelId = useParams().id;
   const [model, setModel] = useState(null);
   const [mainImage, setMainImage] = useState("");
+  const [modelShown, setModelShown] = useState(false);
+  const stlViewerStyle = {
+    width: "32rem",
+    height: "32rem",
+  };
   useEffect(() => {
     fetch(`http://localhost:5000/api/models/${modelId}`)
       .then((res) => res.json())
@@ -21,6 +28,10 @@ function Model() {
   function handleDownload() {
     console.log(modelId);
   }
+  function handleViewModel() {
+    setModelShown(true);
+    setMainImage("");
+  }
   console.log(model);
   return (
     <>
@@ -28,7 +39,18 @@ function Model() {
         <div className={styles["model"]}>
           <div className={styles["model-image"]}>
             <div className={styles["model-image-main"]}>
-              <img src={mainImage} alt="model" />
+              {modelShown ? (
+                <StlViewer
+                  style={stlViewerStyle}
+                  orbitControls
+                  shadows
+                  showAxes
+                  url={model.files[0]}
+                  modelProps={{ scale: 2 }}
+                />
+              ) : (
+                <img src={mainImage} alt="model" />
+              )}
             </div>
             <div className={styles["model-image-additional"]}>
               {model.images.map((image, i) => (
@@ -36,7 +58,10 @@ function Model() {
                   key={i}
                   src={image}
                   alt="model"
-                  onClick={() => setMainImage(image)}
+                  onClick={() => {
+                    setModelShown(false);
+                    setMainImage(image);
+                  }}
                 />
               ))}
             </div>
@@ -90,12 +115,27 @@ function Model() {
               </div>
             </div>
             <div className={styles["model-view-download"]}>
-              <button>View model</button>
+              <button onClick={handleViewModel}>View model</button>
               <button onClick={handleDownload}>Download</button>
             </div>
-            <br />
-            Model comments: {model.comments}
-            <br />
+            <div className={styles["model-comments"]}>
+              {model.comments.length ? (
+                model.comments.map((comment) => <div>comment</div>)
+              ) : (
+                <h4>No comments yet.</h4>
+              )}
+              <form className={formStyles["form"]}>
+                <label htmlFor="comment">Add comment</label>
+                <textarea
+                  name="comment"
+                  id="comment"
+                  cols="30"
+                  rows="10"
+                  placeholder="Comment the model"
+                ></textarea>
+                <input type="submit" value="Comment" />
+              </form>
+            </div>
           </div>
         </div>
       ) : (

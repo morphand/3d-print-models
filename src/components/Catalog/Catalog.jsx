@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import ModelCard from "./ModelCard";
-import styles from "../styles/Catalog.module.css";
+import ModelCard from "../Model/ModelCard";
+import styles from "../../styles/Catalog.module.css";
 
 function Catalog() {
   const [models, setModels] = useState([]);

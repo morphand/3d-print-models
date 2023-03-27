@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import styles from "../styles/Form.module.css";
-import { validateImage } from "../utils/validators";
-import Toast from "./Toast";
+import styles from "../../styles/Form.module.css";
+import { validateImage } from "../../utils/validators";
+import Toast from "../Toast/Toast";
 
 function Upload({ userId }) {
   const [filesSelected, setFilesSelected] = useState(null);

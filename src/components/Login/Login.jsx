@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/Form.module.css";
+import styles from "../../styles/Form.module.css";
 import {
   USERNAME_MIN_LENGTH,
   PASSWORD_MIN_LENGTH,
   validateUsername,
   validatePassword,
   validateLoginDetails,
-} from "../utils/validators";
+} from "../../utils/validators";
 
 function Login({ setToken }) {
   const username = useRef("");

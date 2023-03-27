@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "../styles/Toast.module.css";
+import styles from "../../styles/Toast.module.css";
 
 function Toast({ header, content, hideAfterMs = 3000 }) {
   const [isShown, setIsShown] = useState(true);

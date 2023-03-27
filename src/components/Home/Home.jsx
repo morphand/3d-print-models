@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
-import ModelCard from "./ModelCard";
-import styles from "../styles/Home.module.css";
+import ModelCard from "../Model/ModelCard";
+import styles from "../../styles/Home.module.css";
 
 function Home({ isUserLoggedIn }) {
   const [featuredModels, setFeaturedModels] = useState([]);
