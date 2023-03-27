@@ -5,9 +5,12 @@ import Navigation from "./components/Navigation";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Profile from "./components/Profile";
+import Profile from "./components/Profile/Profile";
 import Footer from "./components/Footer";
 import Upload from "./components/Upload";
+import Catalog from "./components/Catalog";
+import Model from "./components/Model";
+import EditProfile from "./components/Profile/EditProfile";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("auth"));
@@ -39,9 +42,12 @@ function App() {
             <Route path="/login" element={<Login setToken={setToken} />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/profile/:userId/edit" element={<EditProfile />} />
             {isUserLoggedIn && (
               <Route path="/upload" element={<Upload userId={_id} />} />
             )}
+            <Route path="/models" element={<Catalog />} />
+            <Route path="/models/:id" element={<Model />} />
             <Route path="*" element={<h1>404</h1>} />
           </Routes>
         </div>
