@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../styles/Form.module.css";
 import {
   USERNAME_MIN_LENGTH,
@@ -13,7 +14,7 @@ function Login({ setToken }) {
   const password = useRef("");
   const [isValidUsername, setIsValidUsername] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
-
+  const navigate = useNavigate();
   function handleLogin(e) {
     e.preventDefault();
     const req = {
@@ -40,6 +41,7 @@ function Login({ setToken }) {
         if (result.status) {
           localStorage.setItem("auth", result.value.token);
           setToken(result.value.token);
+          navigate("/");
         }
       })
       .catch((e) => console.error(e));
