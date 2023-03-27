@@ -88,7 +88,7 @@ function Register({ setToken }) {
         )}
         <label htmlFor="email">Email</label>
         <input
-          type="text"
+          type="email"
           name="email"
           id="email"
           minLength={EMAIL_MIN_LENGTH}
