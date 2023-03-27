@@ -105,4 +105,16 @@
 .model-is-featured svg {
   width: 3rem;
   fill: hsl(204, 100%, 49%);
+  stroke: goldenrod;
+  stroke-width: 0.12rem;
+}
+
+.model-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.model-comments textarea {
+  resize: none;
 }
