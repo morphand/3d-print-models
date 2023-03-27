@@ -15,6 +15,9 @@ function Navigation({ isUserLoggedIn, _id, username, setToken }) {
           <li>
             <Link to="/">Home</Link>
           </li>
+          <li>
+            <Link to="/models">Catalog</Link>
+          </li>
           {isUserLoggedIn ? (
             // Logged in navigation
             <>
