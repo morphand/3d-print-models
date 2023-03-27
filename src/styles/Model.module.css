@@ -1,0 +1,108 @@
+.model {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.08);
+  border-radius: 0.32rem;
+}
+
+.model-image {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+  max-width: 50%;
+}
+
+.model-image-main img {
+  max-width: 33rem;
+  max-height: 33rem;
+  border-radius: 1.32rem;
+}
+
+.model-image-additional {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+}
+
+.model-image-additional img {
+  max-width: 8rem;
+  max-height: 8rem;
+  border-radius: 0.32rem;
+  cursor: pointer;
+}
+
+.model-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.model-name {
+  font-weight: bold;
+}
+
+.model-description p {
+  font-style: italic;
+}
+
+.model-header {
+  border-bottom: 0.12rem solid hsl(204, 100%, 49%);
+}
+
+.model-statistics {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  border: 0.12rem dotted hsl(204, 100%, 49%);
+  padding: 0.32rem;
+}
+
+.model-statistics-download-count,
+.model-statistics-likes-count,
+.model-statistics-comments-count {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.model-statistics-download-count,
+.model-statistics-likes-count,
+.model-statistics-comments-count svg {
+  width: 3rem;
+}
+
+.model-view-download {
+  display: flex;
+  gap: 0.32rem;
+}
+
+.model-view-download button {
+  background: hsl(204, 100%, 49%);
+  color: hsl(0, 0%, 100%);
+  padding: 0.12rem;
+  margin-top: 0.32rem;
+  font-weight: bold;
+  border: 0;
+  border-radius: 0.12rem;
+  width: 100%;
+  cursor: pointer;
+}
+
+.model-is-featured {
+  font-weight: bold;
+  color: hsl(204, 100%, 49%);
+}
+
+.model-is-featured p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.model-is-featured svg {
+  width: 3rem;
+  fill: hsl(204, 100%, 49%);
+}
