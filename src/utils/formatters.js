@@ -23,3 +23,21 @@ export function numberFormatter(num) {
   // numberFormatter(999); // '999'
   return String(num);
 }
+
+/**
+ * Formats a date to dd/mm/yyyy, hh:mm:ss format.
+ * @param {Date} date Date to get formatted.
+ * @returns {String} Returns the formatted date as a string.
+ */
+export function dateFormatter(date) {
+  const formattedDate = Intl.DateTimeFormat("en-GB", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  }).format(Date.parse(date));
+
+  return formattedDate;
+}
