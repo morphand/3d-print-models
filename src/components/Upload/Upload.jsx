@@ -98,6 +98,7 @@ function Upload({ userId }) {
           ref={modelDescription}
           cols="30"
           rows="10"
+          maxLength="2000"
           placeholder="Describe your model here."
         ></textarea>
         <label htmlFor="model">
