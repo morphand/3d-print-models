@@ -1,9 +1,12 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import styles from "../../styles/Form.module.css";
 import { validateImage } from "../../utils/validators";
 import Toast from "../Toast/Toast";
+import AuthContext from "../../contexts/Auth";
 
-function Upload({ userId }) {
+function Upload() {
+  const authContext = useContext(AuthContext);
+  const userId = authContext._id;
   const [filesSelected, setFilesSelected] = useState(null);
   const [images, setImages] = useState(null);
   const [errors, setErrors] = useState(false);
