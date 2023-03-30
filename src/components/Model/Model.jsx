@@ -11,14 +11,19 @@ import {
   DeleteIcon,
 } from "../Icons/Icons";
 import Comment from "./Comment";
+import LikeButton from "./LikeButton";
+import DislikeButton from "./DislikeButton";
 import { numberFormatter } from "../../utils/formatters";
 import styles from "../../styles/Model.module.css";
 import formStyles from "../../styles/Form.module.css";
+import DownloadButton from "./DownloadButton";
 
 function Model({ username, userId }) {
   const modelId = useParams().id;
   const [model, setModel] = useState(null);
   const [modelComments, setModelComments] = useState([]);
+  const [modelLikes, setModelLikes] = useState(0);
+  const [userLikedModel, setUserLikedModel] = useState(false);
   const [mainImage, setMainImage] = useState("");
   const [modelShown, setModelShown] = useState(false);
   const comment = useRef("");
@@ -26,7 +31,7 @@ function Model({ username, userId }) {
     width: "32rem",
     height: "32rem",
   };
-
+  console.log(modelLikes, userId, userLikedModel);
   useEffect(() => {
     fetch(`http://localhost:5000/api/models/${modelId}`)
       .then((res) => res.json())
@@ -34,10 +39,13 @@ function Model({ username, userId }) {
         setModel(res);
         setMainImage(res.images[0]);
         setModelComments(res.comments);
+        setModelLikes(res.likesCount);
+        setUserLikedModel([...res.usersLikedModel].includes(userId));
       })
       .catch((e) => console.log(e));
   }, [modelId]);
-  function handleDownload() {
+  function handleDownloadModel(e) {
+    e.preventDefault();
     console.log(modelId);
   }
   function handleViewModel() {
@@ -53,8 +61,14 @@ function Model({ username, userId }) {
       body: formData,
     })
       .then((res) => res.json())
-      .then((res) => console.log(res))
+      .then((res) => {
+        setModelLikes((likes) => likes + 1);
+        setUserLikedModel(true);
+      })
       .catch((e) => console.log(e));
+  }
+  function handleDislikeModel() {
+    console.log(modelId);
   }
   function handleEditModel() {
     console.log(modelId);
@@ -190,7 +204,7 @@ function Model({ username, userId }) {
                   <span>
                     <small>Likes</small>
                   </span>
-                  <span>{numberFormatter(model.likesCount)}</span>
+                  <span>{numberFormatter(modelLikes)}</span>
                 </div>
                 <div className={styles["model-statistics-comments-count"]}>
                   <CommentsIcon />
@@ -201,14 +215,15 @@ function Model({ username, userId }) {
                 </div>
               </div>
               <div className={styles["model-download-like-comment"]}>
-                <Link to={model.files[0]}>
-                  <button onClick={handleDownload}>
-                    <DownloadIcon /> Download
-                  </button>
-                </Link>
-                <button onClick={handleLikeModel}>
-                  <LikesIcon /> Like
-                </button>
+                <DownloadButton
+                  file={model.files[0]}
+                  onClick={handleDownloadModel}
+                />
+                {!userLikedModel ? (
+                  <LikeButton handleLikeModel={handleLikeModel} />
+                ) : (
+                  <DislikeButton handleDislikeModel={handleDislikeModel} />
+                )}
                 <button onClick={scrollToComments}>
                   <CommentsIcon /> Comment
                 </button>
@@ -217,14 +232,12 @@ function Model({ username, userId }) {
           </div>
           <div className={styles["model-comments"]}>
             <h4>Comments</h4>
-            {model.comments.length ? (
+            {model.comments && (
               <div className={styles["model-comments-list"]}>
                 {[...modelComments].map((comment) => (
                   <Comment key={comment._id} comment={comment} />
                 ))}
               </div>
-            ) : (
-              <h4>No comments yet.</h4>
             )}
             <form className={formStyles["form"]} onSubmit={handleAddComment}>
               <label htmlFor="comment">Add comment</label>

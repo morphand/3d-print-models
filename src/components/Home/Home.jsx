@@ -7,7 +7,7 @@ import styles from "../../styles/Home.module.css";
 function Home({ isUserLoggedIn }) {
   const [featuredModels, setFeaturedModels] = useState([]);
   const url =
-    "http://localhost:5000/uploads/642155b60b25724752792bdd/model name/Sample.stl";
+    "http://localhost:5000/static/Sample.stl";
   const style = {
     width: "100%",
     height: "100%",
