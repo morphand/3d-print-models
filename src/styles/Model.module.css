@@ -171,10 +171,20 @@
   background: hsl(204, 100%, 49%);
 }
 
+.model-administration-buttons-remove-feature {
+  background: red;
+}
+
 .model-administration-buttons-feature:hover {
   color: hsl(204, 100%, 49%);
   background: hsl(0, 0%, 100%);
   outline: 0.12rem solid hsl(204, 100%, 49%);
+}
+
+.model-administration-buttons-remove-feature:hover {
+  color: red;
+  background: hsl(0, 0%, 100%);
+  outline: 0.12rem solid red;
 }
 
 .model-administration-buttons-edit:hover {
