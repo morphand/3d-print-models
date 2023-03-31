@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/Navigation.module.css";
+import AuthContext from "../../contexts/Auth";
 
-function Navigation({ isUserLoggedIn, _id, username, setToken }) {
+function Navigation({ setToken }) {
   const [isProfileDropdownActive, setIsProfileDropdownActive] = useState(false);
+  const authContext = useContext(AuthContext);
+  const userId = authContext.userId;
+  const username = authContext.username;
+  const isUserLoggedIn = authContext.isUserLoggedIn;
   function Logout() {
     localStorage.clear();
     setToken(null);
@@ -95,7 +100,7 @@ function Navigation({ isUserLoggedIn, _id, username, setToken }) {
                 </div>
                 {isProfileDropdownActive && (
                   <div className="nav-right-profile-link-dropdown">
-                    <Link to={`/profile/${_id}`}>Profile</Link>
+                    <Link to={`/profile/${userId}`}>Profile</Link>
                     <Link to={`/`} onClick={Logout}>
                       Logout
                     </Link>
