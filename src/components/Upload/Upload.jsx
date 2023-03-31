@@ -1,4 +1,5 @@
 import { useRef, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Form.module.css";
 import { validateImage } from "../../utils/validators";
 import Toast from "../Toast/Toast";
@@ -13,6 +14,7 @@ function Upload() {
   const [modelCreated, setModelCreated] = useState(false);
   const modelName = useRef();
   const modelDescription = useRef();
+  const navigate = useNavigate();
   function handleImages(images) {
     setErrors(false);
     [...images].forEach((image, i) => {
@@ -59,6 +61,8 @@ function Upload() {
           .then((res) => res.json())
           .then((res) => {
             setModelCreated(true);
+            const modelId = res.value._id;
+            navigate(`/models/${modelId}`);
           });
       }
     }
