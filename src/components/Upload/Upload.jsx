@@ -6,7 +6,7 @@ import AuthContext from "../../contexts/Auth";
 
 function Upload() {
   const authContext = useContext(AuthContext);
-  const userId = authContext._id;
+  const userId = authContext.userId;
   const [filesSelected, setFilesSelected] = useState(null);
   const [images, setImages] = useState(null);
   const [errors, setErrors] = useState(false);
@@ -25,6 +25,7 @@ function Upload() {
     }
   }
   function handleSubmit(e) {
+    e.preventDefault();
     if (userId) {
       e.preventDefault();
       const formData = new FormData();
