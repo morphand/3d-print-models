@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
 import Loading from "../Loading/Loading";
@@ -17,8 +17,13 @@ import { numberFormatter } from "../../utils/formatters";
 import styles from "../../styles/Model.module.css";
 import formStyles from "../../styles/Form.module.css";
 import DownloadButton from "./DownloadButton";
+import CommentsButton from "./CommentsButton";
+import AuthContext from "../../contexts/Auth";
 
-function Model({ username, userId }) {
+function Model() {
+  const authContext = useContext(AuthContext);
+  const userId = authContext.userId;
+  const username = authContext.username;
   const modelId = useParams().id;
   const [model, setModel] = useState(null);
   const [modelComments, setModelComments] = useState([]);
@@ -26,12 +31,13 @@ function Model({ username, userId }) {
   const [userLikedModel, setUserLikedModel] = useState(false);
   const [mainImage, setMainImage] = useState("");
   const [modelShown, setModelShown] = useState(false);
+  const [isUserCreator, setIsUserCreator] = useState(false);
   const comment = useRef("");
   const stlViewerStyle = {
     width: "32rem",
     height: "32rem",
   };
-  console.log(modelLikes, userId, userLikedModel);
+
   useEffect(() => {
     fetch(`http://localhost:5000/api/models/${modelId}`)
       .then((res) => res.json())
@@ -41,9 +47,10 @@ function Model({ username, userId }) {
         setModelComments(res.comments);
         setModelLikes(res.likesCount);
         setUserLikedModel([...res.usersLikedModel].includes(userId));
+        setIsUserCreator(res.creator._id.toString() === userId);
       })
       .catch((e) => console.log(e));
-  }, [modelId]);
+  }, [modelId, userId]);
   function handleDownloadModel(e) {
     e.preventDefault();
     console.log(modelId);
@@ -74,7 +81,20 @@ function Model({ username, userId }) {
     console.log(modelId);
   }
   function handleDeleteModel() {
-    console.log(modelId);
+    const confirmModelDelete = prompt(
+      `Are you sure you want to delete this model? Enter "${model.name}" to confirm.`
+    );
+    if (confirmModelDelete === model.name) {
+      const formData = new FormData();
+      formData.append("userId", userId);
+      fetch(`http://localhost:5000/api/models/${modelId}`, {
+        method: "DELETE",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((res) => console.log(res))
+        .catch((e) => console.log(e));
+    }
   }
   function handleFeatureModel() {
     console.log(modelId);
@@ -150,26 +170,32 @@ function Model({ username, userId }) {
               <div className={styles["model-header"]}>
                 <div className={styles["model-name"]}>
                   <h2>{model.name}</h2>
-                  <div className={styles["model-administration-buttons"]}>
-                    <button
-                      className={styles["model-administration-buttons-edit"]}
-                      onClick={handleEditModel}
-                    >
-                      <EditIcon /> Edit
-                    </button>
-                    <button
-                      className={styles["model-administration-buttons-delete"]}
-                      onClick={handleDeleteModel}
-                    >
-                      <DeleteIcon /> Delete
-                    </button>
-                    <button
-                      className={styles["model-administration-buttons-feature"]}
-                      onClick={handleFeatureModel}
-                    >
-                      <RibbonIcon /> Feature
-                    </button>
-                  </div>
+                  {isUserCreator && (
+                    <div className={styles["model-administration-buttons"]}>
+                      <button
+                        className={styles["model-administration-buttons-edit"]}
+                        onClick={handleEditModel}
+                      >
+                        <EditIcon /> Edit
+                      </button>
+                      <button
+                        className={
+                          styles["model-administration-buttons-delete"]
+                        }
+                        onClick={handleDeleteModel}
+                      >
+                        <DeleteIcon /> Delete
+                      </button>
+                      <button
+                        className={
+                          styles["model-administration-buttons-feature"]
+                        }
+                        onClick={handleFeatureModel}
+                      >
+                        <RibbonIcon /> Feature
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className={styles["model-creator"]}>
                   <small>
@@ -220,13 +246,11 @@ function Model({ username, userId }) {
                   onClick={handleDownloadModel}
                 />
                 {!userLikedModel ? (
-                  <LikeButton handleLikeModel={handleLikeModel} />
+                  <LikeButton onClick={handleLikeModel} />
                 ) : (
-                  <DislikeButton handleDislikeModel={handleDislikeModel} />
+                  <DislikeButton onClick={handleDislikeModel} />
                 )}
-                <button onClick={scrollToComments}>
-                  <CommentsIcon /> Comment
-                </button>
+                <CommentsButton onClick={scrollToComments} />
               </div>
             </div>
           </div>
