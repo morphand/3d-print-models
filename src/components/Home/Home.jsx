@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
 import ModelCard from "../Model/ModelCard";
 import styles from "../../styles/Home.module.css";
+import AuthContext from "../../contexts/Auth";
 
-function Home({ isUserLoggedIn }) {
+function Home() {
   const [featuredModels, setFeaturedModels] = useState([]);
-  const url =
-    "http://localhost:5000/static/Sample.stl";
+  const authContext = useContext(AuthContext);
+  const isUserLoggedIn = authContext.isUserLoggedIn;
+  const url = "http://localhost:5000/static/Sample.stl";
   const style = {
     width: "100%",
     height: "100%",
