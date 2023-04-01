@@ -14,7 +14,7 @@ import {
   validateRepeatPassword,
 } from "../../utils/validators";
 import styles from "../../styles/Form.module.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Register({ setToken }) {
   const username = useRef("");
@@ -153,6 +153,9 @@ function Register({ setToken }) {
           </p>
         )}
         <input type="submit" value="Register" onClick={handleRegister} />
+        <small>
+          Have account? <Link to="/login">Login</Link> now.
+        </small>
       </form>
     </div>
   );
