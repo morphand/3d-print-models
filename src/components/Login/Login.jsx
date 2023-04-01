@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/Form.module.css";
 import {
   USERNAME_MIN_LENGTH,
@@ -48,49 +48,54 @@ function Login({ setToken }) {
   }
 
   return (
-    <form className={styles["form"]} onSubmit={handleLogin}>
-      <label htmlFor="username">Username</label>
-      <input
-        type="text"
-        name="username"
-        id="username"
-        ref={username}
-        onChange={(e) => {
-          validateUsername(e.target.value)
-            ? setIsValidUsername(true)
-            : setIsValidUsername(false);
-        }}
-        required
-      />
-      {!isValidUsername && (
-        <p className={styles["error-text"]}>
-          <small>
-            Username should be atleast {USERNAME_MIN_LENGTH} characters long.
-          </small>
-        </p>
-      )}
-      <label htmlFor="password">Password</label>
-      <input
-        type="password"
-        name="password"
-        id="password"
-        ref={password}
-        onChange={(e) => {
-          validatePassword(e.target.value)
-            ? setIsValidPassword(true)
-            : setIsValidPassword(false);
-        }}
-        required
-      />
-      {!isValidPassword && (
-        <p className={styles["error-text"]}>
-          <small>
-            Password should be atleast {PASSWORD_MIN_LENGTH} characters long.
-          </small>
-        </p>
-      )}
-      <input type="submit" value="Login" />
-    </form>
+    <>
+      <form className={styles["form"]} onSubmit={handleLogin}>
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          ref={username}
+          onChange={(e) => {
+            validateUsername(e.target.value)
+              ? setIsValidUsername(true)
+              : setIsValidUsername(false);
+          }}
+          required
+        />
+        {!isValidUsername && (
+          <p className={styles["error-text"]}>
+            <small>
+              Username should be atleast {USERNAME_MIN_LENGTH} characters long.
+            </small>
+          </p>
+        )}
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          ref={password}
+          onChange={(e) => {
+            validatePassword(e.target.value)
+              ? setIsValidPassword(true)
+              : setIsValidPassword(false);
+          }}
+          required
+        />
+        {!isValidPassword && (
+          <p className={styles["error-text"]}>
+            <small>
+              Password should be atleast {PASSWORD_MIN_LENGTH} characters long.
+            </small>
+          </p>
+        )}
+        <input type="submit" value="Login" />
+        <small>
+          Don't have account? <Link to="/register">Register</Link> now.
+        </small>
+      </form>
+    </>
   );
 }
 
