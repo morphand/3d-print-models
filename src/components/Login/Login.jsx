@@ -28,7 +28,7 @@ function Login({ setToken }) {
     if (!areValidLoginDetails.status) {
       return areValidLoginDetails.errors.forEach((e) => console.error(e));
     }
-    fetch("http://localhost:5000/login", {
+    fetch("http://localhost:5000/api/login", {
       method: "POST",
       body: JSON.stringify(req),
       headers: {
