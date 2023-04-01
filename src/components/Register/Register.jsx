@@ -44,7 +44,7 @@ function Register({ setToken }) {
       password: password.current.value.trim(),
       repeatPassword: repeatPassword.current.value.trim(),
     };
-    fetch("http://localhost:5000/register", {
+    fetch("http://localhost:5000/api/register", {
       method: "POST",
       body: JSON.stringify(req),
       headers: {
