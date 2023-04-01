@@ -159,6 +159,10 @@
   height: 1rem;
 }
 
+.model-administration-buttons a {
+  text-decoration: none;
+}
+
 .model-administration-buttons-edit {
   background: orange;
 }
@@ -275,4 +279,8 @@
 
 .model-comments-list-single-comment-content {
   font-style: italic;
+}
+
+button:disabled {
+  background: lightgray;
 }
