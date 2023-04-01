@@ -1,13 +1,10 @@
-import { Link } from "react-router-dom";
 import { DownloadIcon } from "../Icons/Icons";
 
-function DownloadButton({ file, onClick }) {
+function DownloadButton({ onClick }) {
   return (
-    <Link to={file}>
-      <button >
+      <button onClick={onClick}>
         <DownloadIcon /> Download
       </button>
-    </Link>
   );
 }
 
