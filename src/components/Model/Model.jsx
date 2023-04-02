@@ -3,22 +3,20 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
 import Loading from "../Loading/Loading";
 import {
-  DownloadIcon,
-  LikesIcon,
-  CommentsIcon,
   RibbonIcon,
   EditIcon,
   DeleteIcon,
 } from "../Icons/Icons";
 import Comment from "./Comment";
-import LikeButton from "./LikeButton";
-import DislikeButton from "./DislikeButton";
-import { numberFormatter } from "../../utils/formatters";
+import LikeButton from "./Buttons/LikeButton";
+import DislikeButton from "./Buttons/DislikeButton";
 import styles from "../../styles/Model.module.css";
 import formStyles from "../../styles/Form.module.css";
-import DownloadButton from "./DownloadButton";
-import CommentsButton from "./CommentsButton";
+import DownloadButton from "./Buttons/DownloadButton";
+import CommentsButton from "./Buttons/CommentsButton";
+import ModelStatistics from "./ModelStatistics";
 import AuthContext from "../../contexts/Auth";
+import RequestSender from "../../utils/RequestSender";
 
 function Model() {
   const authContext = useContext(AuthContext);
@@ -43,6 +41,7 @@ function Model() {
     width: "32rem",
     height: "32rem",
   };
+  const requestSender = new RequestSender();
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/models/${modelId}`)
@@ -60,7 +59,7 @@ function Model() {
       })
       .catch((e) => console.log(e));
   }, [modelId, userId]);
-  function handleDownloadModel() {
+  async function handleDownloadModel() {
     fetch(model.files[0])
       .then((res) => {
         if (res.status !== 200) {
@@ -83,174 +82,108 @@ function Model() {
       })
       .catch((err) => console.error(err));
 
-    fetch(`http://localhost:5000/api/models/${modelId}/download`, {
-      method: "PUT",
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setModelDownloadsCount((downloadsCount) => downloadsCount + 1);
-        console.log(res);
-      })
-      .catch((e) => console.log(e));
-
-    console.log(modelId);
+    await requestSender.put(`/models/${modelId}/download`);
+    setModelDownloadsCount((downloadsCount) => downloadsCount + 1);
   }
   function handleViewModel() {
     setModelShown(true);
     setMainImage("");
   }
-  function handleLikeModel() {
-    console.log(modelId);
+  async function handleLikeModel() {
     const formData = new FormData();
     formData.append("userId", userId);
-    fetch(`http://localhost:5000/api/models/${modelId}/like/add`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setModelLikes((likes) => likes + 1);
-        setUserLikedModel(true);
-      })
-      .catch((e) => console.log(e));
+    await requestSender.post(`/models/${modelId}/like/add`, {
+      data: formData,
+    });
+    setModelLikes((likes) => likes + 1);
+    setUserLikedModel(true);
   }
-  function handleDislikeModel() {
-    console.log(modelId);
+  async function handleDislikeModel() {
     const formData = new FormData();
     formData.append("userId", userId);
-    fetch(`http://localhost:5000/api/models/${modelId}/like/remove`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setModelLikes((likes) => likes - 1);
-        setUserLikedModel(false);
-      })
-      .catch((e) => console.log(e));
+    await requestSender.post(`/models/${modelId}/like/remove`, {
+      data: formData,
+    });
+    setModelLikes((likes) => likes - 1);
+    setUserLikedModel(false);
   }
-  function handleDeleteModel() {
+  async function handleDeleteModel() {
     const confirmModelDelete = prompt(
       `Are you sure you want to delete this model? Enter "${model.name}" to confirm.`
     );
     if (confirmModelDelete === model.name) {
       const formData = new FormData();
       formData.append("userId", userId);
-      fetch(`http://localhost:5000/api/models/${modelId}`, {
-        method: "DELETE",
-        body: formData,
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.status) {
-            navigate("/models");
-          } else {
-            // Show toast
-            console.log(res);
-            console.log(res.errors);
-          }
-        })
-        .catch((e) => console.log(e));
+      const result = await requestSender.delete(`/models/${modelId}`, {
+        data: formData,
+      });
+      if (result.status) {
+        navigate("/models");
+      } else {
+        // Show toast
+        console.log(result);
+        console.log(result.errors);
+      }
     }
   }
-  function handleFeatureModel() {
-    console.log(modelId);
+  async function handleFeatureModel() {
     const formData = new FormData();
     formData.append("userId", userId);
-    fetch(`http://localhost:5000/api/models/${modelId}/feature/add`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res, res.status);
-        if (res.status) {
-          setIsFeaturedModel(true);
-        } else {
-          // Show toast
-          console.log(res.errors);
-        }
-      })
-      .catch((e) => console.log(e));
+    const result = await requestSender.post(`/models/${modelId}/feature/add`, {
+      data: formData,
+    });
+    if (result.status) {
+      setIsFeaturedModel(true);
+    } else {
+      // Show toast
+      console.log(result.errors);
+    }
   }
-  function handleRemoveFeatureModel() {
-    console.log(modelId);
+  async function handleRemoveFeatureModel() {
     const formData = new FormData();
     formData.append("userId", userId);
-    fetch(`http://localhost:5000/api/models/${modelId}/feature/remove`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res, res.status);
-        if (res.status) {
-          setIsFeaturedModel(false);
-        } else {
-          // Show toast
-          console.log(res.errors);
-        }
-      })
-      .catch((e) => console.log(e));
+    const result = await requestSender.post(
+      `/models/${modelId}/feature/remove`,
+      { data: formData }
+    );
+    if (result.status) {
+      setIsFeaturedModel(false);
+    } else {
+      // Show toast
+      console.log(result.errors);
+    }
   }
   function scrollToComments() {
     comment.current.scrollIntoView({ behavior: "smooth" });
   }
   async function getModelComments() {
-    fetch(`http://localhost:5000/api/models/${modelId}/comments`)
-      .then((res) => res.json())
-      .then((res) => {
-        setModelComments(res.comments);
-      })
-      .catch((e) => console.log(e));
+    const res = await requestSender.get(`/models/${modelId}/comments`);
+    setModelComments(res.comments);
   }
-  function handleAddComment(e) {
+  async function handleAddComment(e) {
     e.preventDefault();
     const formData = new FormData();
     formData.append("comment", comment.current.value.trim());
     formData.append("creatorUsername", username);
-    fetch(`http://localhost:5000/api/models/${modelId}/comments`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-        getModelComments();
-        setModelCommentsCount((commentsCount) => commentsCount + 1);
-        comment.current.value = "";
-      })
-      .catch((e) => console.log(e));
+    await requestSender.post(`/models/${modelId}/comments`, {
+      data: formData,
+    });
+    getModelComments();
+    setModelCommentsCount((commentsCount) => commentsCount + 1);
+    comment.current.value = "";
   }
-  function handleDeleteComment(e, comment) {
+  async function handleDeleteComment(e, comment) {
     const commentId = comment._id;
-    const creatorId = comment.creatorId;
-    const modelCommented = comment.modelCommented;
     const formData = new FormData();
     formData.append("commentId", commentId);
     formData.append("isUserAdmin", isUserAdmin);
-    fetch(`http://localhost:5000/api/models/${modelId}/comments`, {
-      method: "DELETE",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-        getModelComments();
-        setModelCommentsCount((commentsCount) => commentsCount - 1);
-      })
-      .catch((e) => console.log(e));
-    console.log(
-      modelId,
-      e,
-      comment,
-      commentId,
-      creatorId,
-      modelCommented,
-      authContext.token
-    );
+    await requestSender.delete(`/models/${modelId}/comments`, {
+      data: formData,
+    });
+    getModelComments();
+    setModelCommentsCount((commentsCount) => commentsCount - 1);
   }
-  console.log(model);
+  // console.log(model);
   return (
     <>
       {model ? (
@@ -359,29 +292,11 @@ function Model() {
                 <h3>Description</h3>
                 <p>{model.description}</p>
               </div>
-              <div className={styles["model-statistics"]}>
-                <div className={styles["model-statistics-download-count"]}>
-                  <DownloadIcon />
-                  <span>
-                    <small>Downloads</small>
-                  </span>
-                  <span>{numberFormatter(modelDownloadsCount)}</span>
-                </div>
-                <div className={styles["model-statistics-likes-count"]}>
-                  <LikesIcon />
-                  <span>
-                    <small>Likes</small>
-                  </span>
-                  <span>{numberFormatter(modelLikes)}</span>
-                </div>
-                <div className={styles["model-statistics-comments-count"]}>
-                  <CommentsIcon />
-                  <span>
-                    <small>Comments</small>
-                  </span>
-                  <span>{numberFormatter(modelCommentsCount)}</span>
-                </div>
-              </div>
+              <ModelStatistics
+                downloadsCount={modelDownloadsCount}
+                likesCount={modelLikes}
+                commentsCount={modelCommentsCount}
+              />
               <div className={styles["model-download-like-comment"]}>
                 <DownloadButton onClick={handleDownloadModel} />
                 {isUserLoggedIn && (
