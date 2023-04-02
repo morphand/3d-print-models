@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
 import Loading from "../Loading/Loading";
 import {
@@ -24,15 +24,21 @@ function Model() {
   const authContext = useContext(AuthContext);
   const userId = authContext.userId;
   const username = authContext.username;
+  const isUserLoggedIn = authContext.isUserLoggedIn;
+  const isUserAdmin = authContext.isUserAdmin;
   const modelId = useParams().id;
   const [model, setModel] = useState(null);
   const [modelComments, setModelComments] = useState([]);
+  const [isFeaturedModel, setIsFeaturedModel] = useState(false);
   const [modelLikes, setModelLikes] = useState(0);
+  const [modelCommentsCount, setModelCommentsCount] = useState(0);
+  const [modelDownloadsCount, setModelDownloadsCount] = useState(0);
   const [userLikedModel, setUserLikedModel] = useState(false);
   const [mainImage, setMainImage] = useState("");
   const [modelShown, setModelShown] = useState(false);
   const [isUserCreator, setIsUserCreator] = useState(false);
   const comment = useRef("");
+  const navigate = useNavigate();
   const stlViewerStyle = {
     width: "32rem",
     height: "32rem",
@@ -48,11 +54,45 @@ function Model() {
         setModelLikes(res.likesCount);
         setUserLikedModel([...res.usersLikedModel].includes(userId));
         setIsUserCreator(res.creator._id.toString() === userId);
+        setIsFeaturedModel(res.isFeatured);
+        setModelCommentsCount(res.comments.length);
+        setModelDownloadsCount(res.downloadsCount);
       })
       .catch((e) => console.log(e));
   }, [modelId, userId]);
-  function handleDownloadModel(e) {
-    e.preventDefault();
+  function handleDownloadModel() {
+    fetch(model.files[0])
+      .then((res) => {
+        if (res.status !== 200) {
+          throw new Error("Bad server response");
+        }
+        return res.blob();
+      })
+      .then((data) => {
+        const url = window.URL.createObjectURL(data);
+        const anchor = document.createElement("a");
+        const filePath = model.files[0].split("/");
+        const fileName = filePath[filePath.length - 1];
+        anchor.href = url;
+        anchor.download = fileName;
+        anchor.click();
+
+        window.URL.revokeObjectURL(url);
+        document.body.appendChild(anchor);
+        document.body.removeChild(anchor);
+      })
+      .catch((err) => console.error(err));
+
+    fetch(`http://localhost:5000/api/models/${modelId}/download`, {
+      method: "PUT",
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setModelDownloadsCount((downloadsCount) => downloadsCount + 1);
+        console.log(res);
+      })
+      .catch((e) => console.log(e));
+
     console.log(modelId);
   }
   function handleViewModel() {
@@ -63,7 +103,7 @@ function Model() {
     console.log(modelId);
     const formData = new FormData();
     formData.append("userId", userId);
-    fetch(`http://localhost:5000/api/models/${modelId}/like`, {
+    fetch(`http://localhost:5000/api/models/${modelId}/like/add`, {
       method: "POST",
       body: formData,
     })
@@ -76,9 +116,18 @@ function Model() {
   }
   function handleDislikeModel() {
     console.log(modelId);
-  }
-  function handleEditModel() {
-    console.log(modelId);
+    const formData = new FormData();
+    formData.append("userId", userId);
+    fetch(`http://localhost:5000/api/models/${modelId}/like/remove`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setModelLikes((likes) => likes - 1);
+        setUserLikedModel(false);
+      })
+      .catch((e) => console.log(e));
   }
   function handleDeleteModel() {
     const confirmModelDelete = prompt(
@@ -92,17 +141,62 @@ function Model() {
         body: formData,
       })
         .then((res) => res.json())
-        .then((res) => console.log(res))
+        .then((res) => {
+          if (res.status) {
+            navigate("/models");
+          } else {
+            // Show toast
+            console.log(res);
+            console.log(res.errors);
+          }
+        })
         .catch((e) => console.log(e));
     }
   }
   function handleFeatureModel() {
     console.log(modelId);
+    const formData = new FormData();
+    formData.append("userId", userId);
+    fetch(`http://localhost:5000/api/models/${modelId}/feature/add`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res, res.status);
+        if (res.status) {
+          setIsFeaturedModel(true);
+        } else {
+          // Show toast
+          console.log(res.errors);
+        }
+      })
+      .catch((e) => console.log(e));
+  }
+  function handleRemoveFeatureModel() {
+    console.log(modelId);
+    const formData = new FormData();
+    formData.append("userId", userId);
+    fetch(`http://localhost:5000/api/models/${modelId}/feature/remove`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res, res.status);
+        if (res.status) {
+          setIsFeaturedModel(false);
+        } else {
+          // Show toast
+          console.log(res.errors);
+        }
+      })
+      .catch((e) => console.log(e));
   }
   function scrollToComments() {
     comment.current.scrollIntoView({ behavior: "smooth" });
   }
-  function getModelComments() {
+  async function getModelComments() {
     fetch(`http://localhost:5000/api/models/${modelId}/comments`)
       .then((res) => res.json())
       .then((res) => {
@@ -123,9 +217,38 @@ function Model() {
       .then((res) => {
         console.log(res);
         getModelComments();
+        setModelCommentsCount((commentsCount) => commentsCount + 1);
         comment.current.value = "";
       })
       .catch((e) => console.log(e));
+  }
+  function handleDeleteComment(e, comment) {
+    const commentId = comment._id;
+    const creatorId = comment.creatorId;
+    const modelCommented = comment.modelCommented;
+    const formData = new FormData();
+    formData.append("commentId", commentId);
+    formData.append("isUserAdmin", isUserAdmin);
+    fetch(`http://localhost:5000/api/models/${modelId}/comments`, {
+      method: "DELETE",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        getModelComments();
+        setModelCommentsCount((commentsCount) => commentsCount - 1);
+      })
+      .catch((e) => console.log(e));
+    console.log(
+      modelId,
+      e,
+      comment,
+      commentId,
+      creatorId,
+      modelCommented,
+      authContext.token
+    );
   }
   console.log(model);
   return (
@@ -170,14 +293,17 @@ function Model() {
               <div className={styles["model-header"]}>
                 <div className={styles["model-name"]}>
                   <h2>{model.name}</h2>
-                  {isUserCreator && (
+                  {(isUserCreator || isUserAdmin) && (
                     <div className={styles["model-administration-buttons"]}>
-                      <button
-                        className={styles["model-administration-buttons-edit"]}
-                        onClick={handleEditModel}
-                      >
-                        <EditIcon /> Edit
-                      </button>
+                      <Link to={`/models/${modelId}/edit`}>
+                        <button
+                          className={
+                            styles["model-administration-buttons-edit"]
+                          }
+                        >
+                          <EditIcon /> Edit
+                        </button>
+                      </Link>
                       <button
                         className={
                           styles["model-administration-buttons-delete"]
@@ -186,14 +312,30 @@ function Model() {
                       >
                         <DeleteIcon /> Delete
                       </button>
-                      <button
-                        className={
-                          styles["model-administration-buttons-feature"]
-                        }
-                        onClick={handleFeatureModel}
-                      >
-                        <RibbonIcon /> Feature
-                      </button>
+                      {isUserAdmin && (
+                        <>
+                          <button
+                            className={
+                              styles["model-administration-buttons-feature"]
+                            }
+                            disabled={isFeaturedModel}
+                            onClick={handleFeatureModel}
+                          >
+                            <RibbonIcon /> Feature
+                          </button>
+                          <button
+                            className={
+                              styles[
+                                "model-administration-buttons-remove-feature"
+                              ]
+                            }
+                            disabled={!isFeaturedModel}
+                            onClick={handleRemoveFeatureModel}
+                          >
+                            <RibbonIcon /> Remove feature
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -206,7 +348,7 @@ function Model() {
                   </small>
                 </div>
               </div>
-              {model.isFeatured && (
+              {isFeaturedModel && (
                 <div className={styles["model-is-featured"]}>
                   <p>
                     Featured model <RibbonIcon />
@@ -223,7 +365,7 @@ function Model() {
                   <span>
                     <small>Downloads</small>
                   </span>
-                  <span>{numberFormatter(model.downloadsCount)}</span>
+                  <span>{numberFormatter(modelDownloadsCount)}</span>
                 </div>
                 <div className={styles["model-statistics-likes-count"]}>
                   <LikesIcon />
@@ -237,20 +379,21 @@ function Model() {
                   <span>
                     <small>Comments</small>
                   </span>
-                  <span>{numberFormatter(model.commentsCount)}</span>
+                  <span>{numberFormatter(modelCommentsCount)}</span>
                 </div>
               </div>
               <div className={styles["model-download-like-comment"]}>
-                <DownloadButton
-                  file={model.files[0]}
-                  onClick={handleDownloadModel}
-                />
-                {!userLikedModel ? (
-                  <LikeButton onClick={handleLikeModel} />
-                ) : (
-                  <DislikeButton onClick={handleDislikeModel} />
+                <DownloadButton onClick={handleDownloadModel} />
+                {isUserLoggedIn && (
+                  <>
+                    {!userLikedModel ? (
+                      <LikeButton onClick={handleLikeModel} />
+                    ) : (
+                      <DislikeButton onClick={handleDislikeModel} />
+                    )}
+                    <CommentsButton onClick={scrollToComments} />
+                  </>
                 )}
-                <CommentsButton onClick={scrollToComments} />
               </div>
             </div>
           </div>
@@ -259,23 +402,29 @@ function Model() {
             {model.comments && (
               <div className={styles["model-comments-list"]}>
                 {[...modelComments].map((comment) => (
-                  <Comment key={comment._id} comment={comment} />
+                  <Comment
+                    key={comment._id}
+                    comment={comment}
+                    onClick={handleDeleteComment}
+                  />
                 ))}
               </div>
             )}
-            <form className={formStyles["form"]} onSubmit={handleAddComment}>
-              <label htmlFor="comment">Add comment</label>
-              <textarea
-                name="comment"
-                id="comment"
-                cols="30"
-                rows="10"
-                placeholder="Comment the model"
-                ref={comment}
-                required
-              ></textarea>
-              <input type="submit" value="Comment" />
-            </form>
+            {isUserLoggedIn && (
+              <form className={formStyles["form"]} onSubmit={handleAddComment}>
+                <label htmlFor="comment">Add comment</label>
+                <textarea
+                  name="comment"
+                  id="comment"
+                  cols="30"
+                  rows="10"
+                  placeholder="Comment the model"
+                  ref={comment}
+                  required
+                ></textarea>
+                <input type="submit" value="Comment" />
+              </form>
+            )}
           </div>
         </>
       ) : (
