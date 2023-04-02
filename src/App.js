@@ -36,6 +36,7 @@ function App() {
         username: username,
         isUserLoggedIn: token ? true : false,
         isUserAdmin: isUserAdmin,
+        token: token,
       }
     : {};
 
