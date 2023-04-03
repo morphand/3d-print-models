@@ -2,21 +2,22 @@ import { useEffect, useState, useRef, useContext } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
 import Loading from "../Loading/Loading";
-import {
-  RibbonIcon,
-  EditIcon,
-  DeleteIcon,
-} from "../Icons/Icons";
+import { RibbonIcon } from "../Icons/Icons";
 import Comment from "./Comment";
 import LikeButton from "./Buttons/LikeButton";
 import DislikeButton from "./Buttons/DislikeButton";
 import styles from "../../styles/Model.module.css";
-import formStyles from "../../styles/Form.module.css";
 import DownloadButton from "./Buttons/DownloadButton";
 import CommentsButton from "./Buttons/CommentsButton";
 import ModelStatistics from "./ModelStatistics";
 import AuthContext from "../../contexts/Auth";
 import RequestSender from "../../utils/RequestSender";
+import AddCommentForm from "./Forms/AddCommentForm";
+import CommentsList from "./CommentsList";
+import FeatureButton from "./Buttons/FeatureButton";
+import RemoveFeatureButton from "./Buttons/RemoveFeatureButton";
+import DeleteModelButton from "./Buttons/DeleteModelButton";
+import EditModelButton from "./Buttons/EditModelButton";
 
 function Model() {
   const authContext = useContext(AuthContext);
@@ -90,20 +91,12 @@ function Model() {
     setMainImage("");
   }
   async function handleLikeModel() {
-    const formData = new FormData();
-    formData.append("userId", userId);
-    await requestSender.post(`/models/${modelId}/like/add`, {
-      data: formData,
-    });
+    await requestSender.post(`/models/${modelId}/like/add`);
     setModelLikes((likes) => likes + 1);
     setUserLikedModel(true);
   }
   async function handleDislikeModel() {
-    const formData = new FormData();
-    formData.append("userId", userId);
-    await requestSender.post(`/models/${modelId}/like/remove`, {
-      data: formData,
-    });
+    await requestSender.post(`/models/${modelId}/like/remove`);
     setModelLikes((likes) => likes - 1);
     setUserLikedModel(false);
   }
@@ -112,11 +105,7 @@ function Model() {
       `Are you sure you want to delete this model? Enter "${model.name}" to confirm.`
     );
     if (confirmModelDelete === model.name) {
-      const formData = new FormData();
-      formData.append("userId", userId);
-      const result = await requestSender.delete(`/models/${modelId}`, {
-        data: formData,
-      });
+      const result = await requestSender.delete(`/models/${modelId}`);
       if (result.status) {
         navigate("/models");
       } else {
@@ -127,11 +116,7 @@ function Model() {
     }
   }
   async function handleFeatureModel() {
-    const formData = new FormData();
-    formData.append("userId", userId);
-    const result = await requestSender.post(`/models/${modelId}/feature/add`, {
-      data: formData,
-    });
+    const result = await requestSender.post(`/models/${modelId}/feature/add`);
     if (result.status) {
       setIsFeaturedModel(true);
     } else {
@@ -140,11 +125,8 @@ function Model() {
     }
   }
   async function handleRemoveFeatureModel() {
-    const formData = new FormData();
-    formData.append("userId", userId);
     const result = await requestSender.post(
-      `/models/${modelId}/feature/remove`,
-      { data: formData }
+      `/models/${modelId}/feature/remove`
     );
     if (result.status) {
       setIsFeaturedModel(false);
@@ -176,7 +158,6 @@ function Model() {
     const commentId = comment._id;
     const formData = new FormData();
     formData.append("commentId", commentId);
-    formData.append("isUserAdmin", isUserAdmin);
     await requestSender.delete(`/models/${modelId}/comments`, {
       data: formData,
     });
@@ -228,45 +209,18 @@ function Model() {
                   <h2>{model.name}</h2>
                   {(isUserCreator || isUserAdmin) && (
                     <div className={styles["model-administration-buttons"]}>
-                      <Link to={`/models/${modelId}/edit`}>
-                        <button
-                          className={
-                            styles["model-administration-buttons-edit"]
-                          }
-                        >
-                          <EditIcon /> Edit
-                        </button>
-                      </Link>
-                      <button
-                        className={
-                          styles["model-administration-buttons-delete"]
-                        }
-                        onClick={handleDeleteModel}
-                      >
-                        <DeleteIcon /> Delete
-                      </button>
+                      <EditModelButton modelId={modelId} />
+                      <DeleteModelButton onClick={handleDeleteModel} />
                       {isUserAdmin && (
                         <>
-                          <button
-                            className={
-                              styles["model-administration-buttons-feature"]
-                            }
-                            disabled={isFeaturedModel}
+                          <FeatureButton
                             onClick={handleFeatureModel}
-                          >
-                            <RibbonIcon /> Feature
-                          </button>
-                          <button
-                            className={
-                              styles[
-                                "model-administration-buttons-remove-feature"
-                              ]
-                            }
-                            disabled={!isFeaturedModel}
+                            disabled={isFeaturedModel}
+                          />
+                          <RemoveFeatureButton
                             onClick={handleRemoveFeatureModel}
-                          >
-                            <RibbonIcon /> Remove feature
-                          </button>
+                            disabled={!isFeaturedModel}
+                          />
                         </>
                       )}
                     </div>
@@ -315,7 +269,7 @@ function Model() {
           <div className={styles["model-comments"]}>
             <h4>Comments</h4>
             {model.comments && (
-              <div className={styles["model-comments-list"]}>
+              <CommentsList>
                 {[...modelComments].map((comment) => (
                   <Comment
                     key={comment._id}
@@ -323,22 +277,10 @@ function Model() {
                     onClick={handleDeleteComment}
                   />
                 ))}
-              </div>
+              </CommentsList>
             )}
             {isUserLoggedIn && (
-              <form className={formStyles["form"]} onSubmit={handleAddComment}>
-                <label htmlFor="comment">Add comment</label>
-                <textarea
-                  name="comment"
-                  id="comment"
-                  cols="30"
-                  rows="10"
-                  placeholder="Comment the model"
-                  ref={comment}
-                  required
-                ></textarea>
-                <input type="submit" value="Comment" />
-              </form>
+              <AddCommentForm onSubmit={handleAddComment} ref={comment} />
             )}
           </div>
         </>
