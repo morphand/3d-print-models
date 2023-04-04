@@ -125,6 +125,73 @@ export function validateLoginDetails(username, password) {
   return result;
 }
 
+export function validateRegisterDetails(
+  username,
+  email,
+  password,
+  repeatPassword
+) {
+  const result = new ValidationResult();
+
+  // If some fields are empty, push errors and return the result.
+  if (!username || !email || !password || !repeatPassword) {
+    if (!username) {
+      result.errors.push(`No username provided.`);
+    }
+    if (!email) {
+      result.errors.push(`No email provided.`);
+    }
+    if (!password) {
+      result.errors.push(`No password provided.`);
+    }
+    if (!repeatPassword) {
+      result.errors.push(`No repeat password provided.`);
+    }
+    return result;
+  }
+
+  // Validation.
+  const isValidUsername = validateUsername(username.trim());
+  const isValidEmail = validateEmail(email.trim());
+  const isValidPassword = validatePassword(password.trim());
+  const isValidRepeatPassword = validateRepeatPassword(
+    password.trim(),
+    repeatPassword.trim()
+  );
+
+  // If some fields are invalid, push errors and return the result.
+  if (
+    !isValidUsername ||
+    !isValidEmail ||
+    !isValidPassword ||
+    !isValidRepeatPassword
+  ) {
+    if (!isValidUsername) {
+      result.errors.push(
+        `The length of the username has to be atleast ${USERNAME_MIN_LENGTH} characters long.`
+      );
+    }
+    if (!isValidEmail) {
+      result.errors.push(
+        `The length of the email has to be atleast ${EMAIL_MIN_LENGTH} characters long and match the pattern **@**.**.`
+      );
+    }
+    if (!isValidPassword) {
+      result.errors.push(
+        `The length of the password has to be atleast ${PASSWORD_MIN_LENGTH} characters long.`
+      );
+    }
+    if (!isValidRepeatPassword) {
+      result.errors.push(`Both passwords must match.`);
+    }
+    return result;
+  }
+
+  // Else return status true in the result.
+  result.status = true;
+  return result;
+}
+
 /**
  * @param {String} modelName
  * @returns {Boolean}
