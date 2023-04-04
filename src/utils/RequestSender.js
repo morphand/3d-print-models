@@ -29,7 +29,6 @@ class RequestSender {
     const requestParams = this.token
       ? { method: "GET", headers }
       : { method: "GET" };
-    console.log(requestParams);
     try {
       const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
       console.log(this.token, this.headers, res);
