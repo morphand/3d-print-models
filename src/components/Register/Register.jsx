@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   USERNAME_MIN_LENGTH,
@@ -17,12 +17,15 @@ import {
 } from "../../utils/validators";
 import styles from "../../styles/Form.module.css";
 import RequestSender from "../../utils/RequestSender";
+import ToastContext from "../../contexts/Toast";
 
-function Register({ showToast }) {
+function Register() {
   const username = useRef("");
   const email = useRef("");
   const password = useRef("");
   const repeatPassword = useRef("");
+  const toastContext = useContext(ToastContext);
+  const showToast = toastContext.showToast;
   const [isValidUsername, setIsValidUsername] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
@@ -76,23 +79,6 @@ function Register({ showToast }) {
     // Else show the errors.
     result.errors.forEach((e) => description.push(e));
     return showToast(error, description.join(" "));
-
-    // fetch("http://localhost:5000/api/register", {
-    //   method: "POST",
-    //   body: JSON.stringify(req),
-    //   headers: {
-    //     "Content-type": "application/json",
-    //   },
-    // })
-    //   .then((data) => data.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     console.log(data.status);
-    //     console.log(data.errors);
-    //     console.log(data.value);
-    //     navigate("/login");
-    //   })
-    //   .catch((e) => console.error(e));
   }
 
   return (

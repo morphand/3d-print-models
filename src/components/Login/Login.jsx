@@ -10,10 +10,13 @@ import {
 } from "../../utils/validators";
 import RequestSender from "../../utils/RequestSender";
 import AuthContext from "../../contexts/Auth";
+import ToastContext from "../../contexts/Toast";
 
-function Login({ showToast }) {
+function Login() {
   const authContext = useContext(AuthContext);
   const setToken = authContext.setToken;
+  const toastContext = useContext(ToastContext);
+  const showToast = toastContext.showToast;
   const username = useRef("");
   const password = useRef("");
   const [isValidUsername, setIsValidUsername] = useState(false);

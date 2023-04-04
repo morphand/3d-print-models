@@ -15,6 +15,7 @@ import EditModel from "./components/Model/EditModel";
 import Toast from "./components/Toast/Toast";
 import RouteGuard from "./components/RouteGuard";
 import AuthContext from "./contexts/Auth";
+import ToastContext from "./contexts/Toast";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("auth"));
@@ -25,7 +26,7 @@ function App() {
   const [isToastShown, setIsToastShown] = useState(false);
   const [toastHeader, setToastHeader] = useState("");
   const [toastContent, setToastContent] = useState("");
-  const contextValues = token
+  const authContextValues = token
     ? {
         userId: _id,
         username: username,
@@ -37,6 +38,7 @@ function App() {
     : {
         setToken: setToken,
       };
+  const toastContextValues = { showToast: showToast };
 
   useEffect(() => {
     if (decodedToken) {
@@ -59,41 +61,42 @@ function App() {
 
   return (
     <div className="App">
-      <AuthContext.Provider value={contextValues}>
-        <Navigation />
-        {isToastShown && <Toast header={toastHeader} content={toastContent} />}
-        <main>
-          <div className="container">
-            <Routes>
-              {/* Routes available for everyone */}
-              <Route path="/" element={<Home />} />
-              <Route path="/profile/:userId" element={<Profile />} />
-              <Route path="/models" element={<Catalog />} />
-              <Route path="/models/:id" element={<Model />} />
-              <Route path="*" element={<h1>404</h1>} />
+      <AuthContext.Provider value={authContextValues}>
+        <ToastContext.Provider value={toastContextValues}>
+          <Navigation />
+          {isToastShown && (
+            <Toast header={toastHeader} content={toastContent} />
+          )}
+          <main>
+            <div className="container">
+              <Routes>
+                {/* Routes available for everyone */}
+                <Route path="/" element={<Home />} />
+                <Route path="/profile/:userId" element={<Profile />} />
+                <Route path="/models" element={<Catalog />} />
+                <Route path="/models/:id" element={<Model />} />
+                <Route path="*" element={<h1>404</h1>} />
 
-              {/* Routes available for logged out users */}
-              <Route element={<RouteGuard requireUserLoggedOut />}>
-                <Route
-                  path="/login"
-                  element={<Login showToast={showToast} />}
-                />
-                <Route
-                  path="/register"
-                  element={<Register showToast={showToast} />}
-                />
-              </Route>
+                {/* Routes available for logged out users */}
+                <Route element={<RouteGuard requireUserLoggedOut />}>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                </Route>
 
-              {/* Routes available for logged in users */}
-              <Route element={<RouteGuard requireUserLoggedIn />}>
-                <Route path="/profile/:userId/edit" element={<EditProfile />} />
-                <Route path="/models/:id/edit" element={<EditModel />} />
-                <Route path="/upload" element={<Upload />} />
-              </Route>
-            </Routes>
-          </div>
-        </main>
-        <Footer />
+                {/* Routes available for logged in users */}
+                <Route element={<RouteGuard requireUserLoggedIn />}>
+                  <Route
+                    path="/profile/:userId/edit"
+                    element={<EditProfile />}
+                  />
+                  <Route path="/models/:id/edit" element={<EditModel />} />
+                  <Route path="/upload" element={<Upload />} />
+                </Route>
+              </Routes>
+            </div>
+          </main>
+          <Footer />
+        </ToastContext.Provider>
       </AuthContext.Provider>
     </div>
   );
