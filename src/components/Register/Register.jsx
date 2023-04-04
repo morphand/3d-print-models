@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   USERNAME_MIN_LENGTH,
   USERNAME_MAX_LENGTH,
@@ -12,11 +13,12 @@ import {
   validatePassword,
   validateEmail,
   validateRepeatPassword,
+  validateRegisterDetails,
 } from "../../utils/validators";
 import styles from "../../styles/Form.module.css";
-import { Link, useNavigate } from "react-router-dom";
+import RequestSender from "../../utils/RequestSender";
 
-function Register({ setToken }) {
+function Register({ showToast }) {
   const username = useRef("");
   const email = useRef("");
   const password = useRef("");
@@ -27,39 +29,70 @@ function Register({ setToken }) {
   const [isValidRepeatPassword, setIsValidRepeatPassword] = useState(false);
   const navigate = useNavigate();
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
     e.preventDefault();
-    // Register
-    console.log(
-      e.target.value,
-      username.current.value,
-      email.current.value,
-      password.current.value,
-      repeatPassword.current.value
-    );
-    // add validation
+    // Get the request's username, email, password and repeatPassword from the form and trim them.
     const req = {
       username: username.current.value.trim(),
       email: email.current.value.trim(),
       password: password.current.value.trim(),
       repeatPassword: repeatPassword.current.value.trim(),
     };
-    fetch("http://localhost:5000/api/register", {
-      method: "POST",
-      body: JSON.stringify(req),
-      headers: {
-        "Content-type": "application/json",
-      },
-    })
-      .then((data) => data.json())
-      .then((data) => {
-        console.log(data);
-        console.log(data.status);
-        console.log(data.errors);
-        console.log(data.value);
-        navigate("/login");
-      })
-      .catch((e) => console.error(e));
+
+    // Validate the provided username, email, password and repeatPassword.
+    const areValidRegisterDetails = validateRegisterDetails(
+      req.username,
+      req.email,
+      req.password,
+      req.repeatPassword
+    );
+
+    // Initialize the error and description variables, which will hold the errors.
+    let error = "Invalid login details.";
+    const description = [];
+
+    // If the status of the validation is false, append the errors to the description and return Toast with the provided values.
+    if (!areValidRegisterDetails.status) {
+      areValidRegisterDetails.errors.forEach((e) => description.push(e));
+      return showToast(error, description.join(" "));
+    }
+
+    // Prepare the form data.
+    const formData = new FormData();
+    formData.append("username", req.username);
+    formData.append("email", req.email);
+    formData.append("password", req.password);
+    formData.append("repeatPassword", req.repeatPassword);
+
+    // Make the request.
+    const requestSender = new RequestSender();
+    const result = await requestSender.post(`/register`, { data: formData });
+
+    // Navigate to login on result success status.
+    if (result.status) {
+      return navigate("/login");
+    }
+
+    // Else show the errors.
+    result.errors.forEach((e) => description.push(e));
+    return showToast(error, description.join(" "));
+
+    // fetch("http://localhost:5000/api/register", {
+    //   method: "POST",
+    //   body: JSON.stringify(req),
+    //   headers: {
+    //     "Content-type": "application/json",
+    //   },
+    // })
+    //   .then((data) => data.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //     console.log(data.status);
+    //     console.log(data.errors);
+    //     console.log(data.value);
+    //     navigate("/login");
+    //   })
+    //   .catch((e) => console.error(e));
   }
 
   return (
