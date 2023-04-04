@@ -36,12 +36,12 @@ function Login({ showToast }) {
 
     // Initialize the error and description variables, which will hold the errors.
     let error = "Invalid login details.";
-    let description = "";
+    const description = [];
 
     // If the status of the validation is false, append the errors to the description and return Toast with the provided values.
     if (!areValidLoginDetails.status) {
-      areValidLoginDetails.errors.forEach((e) => (description += e));
-      return showToast(error, description);
+      areValidLoginDetails.errors.forEach((e) => description.push(e));
+      return showToast(error, description.join(" "));
     }
 
     // Prepare the form data.
@@ -61,8 +61,8 @@ function Login({ showToast }) {
     }
 
     // Else show the errors.
-    result.errors.forEach((e) => (description += e));
-    return showToast(error, description);
+    result.errors.forEach((e) => description.push(e));
+    return showToast(error, description.join(" "));
   }
 
   return (
