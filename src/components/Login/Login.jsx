@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/Form.module.css";
 import {
@@ -8,43 +8,61 @@ import {
   validatePassword,
   validateLoginDetails,
 } from "../../utils/validators";
+import RequestSender from "../../utils/RequestSender";
+import AuthContext from "../../contexts/Auth";
 
-function Login({ setToken }) {
+function Login({ showToast }) {
+  const authContext = useContext(AuthContext);
+  const setToken = authContext.setToken;
   const username = useRef("");
   const password = useRef("");
   const [isValidUsername, setIsValidUsername] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
   const navigate = useNavigate();
-  function handleLogin(e) {
+
+  async function handleLogin(e) {
     e.preventDefault();
+    // Get the request's username and password from the form and trim them.
     const req = {
       username: username.current.value.trim(),
       password: password.current.value.trim(),
     };
+
+    // Validate the provided username and password.
     const areValidLoginDetails = validateLoginDetails(
       req.username,
       req.password
     );
+
+    // Initialize the error and description variables, which will hold the errors.
+    let error = "Invalid login details.";
+    let description = "";
+
+    // If the status of the validation is false, append the errors to the description and return Toast with the provided values.
     if (!areValidLoginDetails.status) {
-      return areValidLoginDetails.errors.forEach((e) => console.error(e));
+      areValidLoginDetails.errors.forEach((e) => (description += e));
+      return showToast(error, description);
     }
-    fetch("http://localhost:5000/api/login", {
-      method: "POST",
-      body: JSON.stringify(req),
-      headers: {
-        "Content-type": "application/json",
-      },
-    })
-      .then((data) => data.json())
-      .then((result) => {
-        console.log(result);
-        if (result.status) {
-          localStorage.setItem("auth", result.value.token);
-          setToken(result.value.token);
-          navigate("/");
-        }
-      })
-      .catch((e) => console.error(e));
+
+    // Prepare the form data.
+    const formData = new FormData();
+    formData.append("username", req.username);
+    formData.append("password", req.password);
+
+    // Make the request.
+    const requestSender = new RequestSender();
+    const result = await requestSender.post(`/login`, { data: formData });
+
+    // Set token on result success status.
+    if (result.status) {
+      localStorage.setItem("auth", result.value.token);
+      setToken(result.value.token);
+      return navigate("/");
+    }
+
+    // Else show the errors.
+    result.errors.forEach((e) => (description += e));
+    return showToast(error, description);
   }
 
   return (
