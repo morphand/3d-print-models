@@ -12,6 +12,7 @@ import Catalog from "./components/Catalog/Catalog";
 import Model from "./components/Model/Model";
 import EditProfile from "./components/Profile/EditProfile";
 import EditModel from "./components/Model/EditModel";
+import Toast from "./components/Toast/Toast";
 import RouteGuard from "./components/RouteGuard";
 import AuthContext from "./contexts/Auth";
 
@@ -21,6 +22,21 @@ function App() {
   const [_id, set_id] = useState("");
   const [username, setUsername] = useState("");
   const [isUserAdmin, setIsUserAdmin] = useState(false);
+  const [isToastShown, setIsToastShown] = useState(false);
+  const [toastHeader, setToastHeader] = useState("");
+  const [toastContent, setToastContent] = useState("");
+  const contextValues = token
+    ? {
+        userId: _id,
+        username: username,
+        isUserLoggedIn: token ? true : false,
+        isUserAdmin: isUserAdmin,
+        token: token,
+        setToken: setToken,
+      }
+    : {
+        setToken: setToken,
+      };
 
   useEffect(() => {
     if (decodedToken) {
@@ -30,20 +46,22 @@ function App() {
     }
   }, [decodedToken]);
 
-  const contextValues = token
-    ? {
-        userId: _id,
-        username: username,
-        isUserLoggedIn: token ? true : false,
-        isUserAdmin: isUserAdmin,
-        token: token,
-      }
-    : {};
+  function showToast(header, content) {
+    setToastHeader(header);
+    setToastContent(content);
+    setIsToastShown(true);
+    setTimeout(() => {
+      setIsToastShown(false);
+      setToastHeader("");
+      setToastContent("");
+    }, 3000);
+  }
 
   return (
     <div className="App">
       <AuthContext.Provider value={contextValues}>
-        <Navigation setToken={setToken} />
+        <Navigation />
+        {isToastShown && <Toast header={toastHeader} content={toastContent} />}
         <main>
           <div className="container">
             <Routes>
@@ -56,8 +74,14 @@ function App() {
 
               {/* Routes available for logged out users */}
               <Route element={<RouteGuard requireUserLoggedOut />}>
-                <Route path="/login" element={<Login setToken={setToken} />} />
-                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/login"
+                  element={<Login showToast={showToast} />}
+                />
+                <Route
+                  path="/register"
+                  element={<Register showToast={showToast} />}
+                />
               </Route>
 
               {/* Routes available for logged in users */}
