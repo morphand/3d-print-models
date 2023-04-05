@@ -1,0 +1,36 @@
+.search {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.search input[type="text"] {
+  width: 85%;
+  border: none;
+  border-bottom: 0.12rem solid;
+  font-weight: bold;
+  padding: 0.32rem;
+}
+
+.search input[type="text"]:focus {
+  outline: 0.12rem hsl(204, 100%, 49%);
+}
+
+.search input[type="submit"] {
+  width: 15%;
+  background: hsl(204, 100%, 49%);
+  color: hsl(0, 0%, 100%);
+  padding: 0.12rem;
+  margin-top: 0.32rem;
+  font-weight: bold;
+  border: 0;
+  border-radius: 0.12rem;
+  transition: 100ms ease;
+}
+
+.search input[type="submit"]:hover {
+  cursor: pointer;
+  color: hsl(204, 100%, 49%);
+  background: hsl(0, 0%, 100%);
+  outline: 0.12rem solid hsl(204, 100%, 49%);
+}
