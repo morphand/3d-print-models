@@ -1,14 +1,16 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { MenuIcon, CloseIcon } from "../Icons/Icons";
 import styles from "../../styles/Navigation.module.css";
 import AuthContext from "../../contexts/Auth";
 
-function Navigation({ setToken }) {
+function Navigation() {
   const [isProfileDropdownActive, setIsProfileDropdownActive] = useState(false);
   const authContext = useContext(AuthContext);
   const userId = authContext.userId;
   const username = authContext.username;
   const isUserLoggedIn = authContext.isUserLoggedIn;
+  const setToken = authContext.setToken;
   function Logout() {
     localStorage.clear();
     setToken(null);
@@ -51,52 +53,11 @@ function Navigation({ setToken }) {
               <div className="nav-right-profile-link-username">
                 {username}
                 <div
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setIsProfileDropdownActive(!isProfileDropdownActive);
                   }}
                 >
-                  {!isProfileDropdownActive ? (
-                    <>
-                      {/* <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> */}
-                      <svg
-                        version="1.1"
-                        id="Layer_1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 472.615 472.615"
-                      >
-                        <g>
-                          <g>
-                            <rect y="377.561" width="472.615" height="65.035" />
-                          </g>
-                        </g>
-                        <g>
-                          <g>
-                            <rect y="188.81" width="472.615" height="65.035" />
-                          </g>
-                        </g>
-                        <g>
-                          <g>
-                            <rect y="0.02" width="472.615" height="65.035" />
-                          </g>
-                        </g>
-                      </svg>
-                    </>
-                  ) : (
-                    <>
-                      {/* <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> */}
-                      <svg
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M19.207 6.207a1 1 0 0 0-1.414-1.414L12 10.586 6.207 4.793a1 1 0 0 0-1.414 1.414L10.586 12l-5.793 5.793a1 1 0 1 0 1.414 1.414L12 13.414l5.793 5.793a1 1 0 0 0 1.414-1.414L13.414 12l5.793-5.793z"
-                        />
-                      </svg>
-                    </>
-                  )}
+                  {!isProfileDropdownActive ? <MenuIcon /> : <CloseIcon />}
                 </div>
                 {isProfileDropdownActive && (
                   <div className="nav-right-profile-link-dropdown">
