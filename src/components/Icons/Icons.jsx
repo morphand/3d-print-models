@@ -133,3 +133,42 @@ export function DislikeIcon() {
     </svg>
   );
 }
+
+export function MenuIcon() {
+  return (
+    <svg
+      version="1.1"
+      id="Layer_1"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 472.615 472.615"
+    >
+      <g>
+        <g>
+          <rect y="377.561" width="472.615" height="65.035" />
+        </g>
+      </g>
+      <g>
+        <g>
+          <rect y="188.81" width="472.615" height="65.035" />
+        </g>
+      </g>
+      <g>
+        <g>
+          <rect y="0.02" width="472.615" height="65.035" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M19.207 6.207a1 1 0 0 0-1.414-1.414L12 10.586 6.207 4.793a1 1 0 0 0-1.414 1.414L10.586 12l-5.793 5.793a1 1 0 1 0 1.414 1.414L12 13.414l5.793 5.793a1 1 0 0 0 1.414-1.414L13.414 12l5.793-5.793z"
+      />
+    </svg>
+  );
+}
