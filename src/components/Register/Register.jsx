@@ -51,7 +51,7 @@ function Register() {
     );
 
     // Initialize the error and description variables, which will hold the errors.
-    let error = "Invalid login details.";
+    let error = "Invalid register details.";
     const description = [];
 
     // If the status of the validation is false, append the errors to the description and return Toast with the provided values.
