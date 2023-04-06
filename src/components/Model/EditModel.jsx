@@ -1,7 +1,8 @@
-import { useRef, useContext } from "react";
+import { useRef, useContext, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "../../styles/Form.module.css";
 import AuthContext from "../../contexts/Auth";
+import RequestSender from "../../utils/RequestSender";
 
 function EditModel() {
   const authContext = useContext(AuthContext);
@@ -9,36 +10,41 @@ function EditModel() {
   const modelId = useParams().id;
   const modelName = useRef();
   const modelDescription = useRef();
+  const [modelNameInitialValue, setModelNameInitialValue] = useState("");
+  const [modelDescriptionInitialValue, setModelDescriptionInitialValue] =
+    useState("");
   const navigate = useNavigate();
-  function handleSubmit(e) {
+  const requestSender = new RequestSender();
+  async function handleSubmit(e) {
     e.preventDefault();
     if (userId) {
-      const formData = new FormData();
-
       // Set basic model info.
-      formData.append(
-        "modelInfo",
-        JSON.stringify({
-          creatorId: userId,
-          modelName: modelName.current.value,
-          modelDescription: modelDescription.current.value,
-        })
-      );
-      console.log(formData, modelId);
+      const formData = new FormData();
+      formData.append("creatorId", userId);
+      formData.append("modelName", modelName.current.value);
+      formData.append("modelDescription", modelDescription.current.value);
+
       // Send request.
-        fetch(`http://localhost:5000/api/models/${modelId}/edit`, {
-          method: "POST",
-          body: formData,
-        })
-          .then((res) => res.json())
-          .then((res) => {
-            navigate(`/models/${modelId}`);
-          });
+      const result = await requestSender.post(`/models/${modelId}/edit`, {
+        data: formData,
+      });
+
+      if (result.status) {
+        return navigate(`/models/${modelId}`);
+      }
     }
+  }
+  async function getInitialValues() {
+    const result = await requestSender.get(`/models/${modelId}`);
+    setModelNameInitialValue(result.name);
+    setModelDescriptionInitialValue(result.description);
   }
   function handleBackToModel() {
     navigate(`/models/${modelId}`);
   }
+  useEffect(() => {
+    getInitialValues();
+  }, []);
   return (
     <div>
       <div
@@ -77,6 +83,7 @@ function EditModel() {
           name="modelName"
           id="modelName"
           ref={modelName}
+          defaultValue={modelNameInitialValue}
           minLength="2"
           maxLength="45"
           placeholder="The name of your model."
@@ -87,6 +94,7 @@ function EditModel() {
           name="modelDescription"
           id="modelDescription"
           ref={modelDescription}
+          defaultValue={modelDescriptionInitialValue}
           cols="30"
           rows="10"
           maxLength="2000"
