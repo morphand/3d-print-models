@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   PASSWORD_MIN_LENGTH,
@@ -10,10 +10,19 @@ import {
   validatePassword,
   validateEmail,
   validateRepeatPassword,
+  validateEditUserDetails,
 } from "../../utils/validators";
+import AuthContext from "../../contexts/Auth";
+import ToastContext from "../../contexts/Toast";
 import styles from "../../styles/Form.module.css";
+import RequestSender from "../../utils/RequestSender";
 
 function EditProfile() {
+  const authContext = useContext(AuthContext);
+  const currentUserId = authContext.userId;
+  const isUserAdmin = authContext.isUserAdmin;
+  const toastContext = useContext(ToastContext);
+  const showToast = toastContext.showToast;
   const email = useRef("");
   const password = useRef("");
   const repeatPassword = useRef("");
@@ -22,10 +31,57 @@ function EditProfile() {
   const [isValidRepeatPassword, setIsValidRepeatPassword] = useState(false);
   const { userId } = useParams();
   const navigate = useNavigate();
-  function handleSubmit(e) {
-    e.preventDefault();
+  if (currentUserId !== userId || !isUserAdmin) {
     navigate(`/profile/${userId}`);
-    console.log(userId);
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    // Get the request's email, password and repeatPassword from the form and trim them.
+    const req = {
+      email: email.current.value.trim(),
+      password: password.current.value.trim(),
+      repeatPassword: repeatPassword.current.value.trim(),
+    };
+
+    // Validate the provided username, email, password and repeatPassword.
+    const areValidEditUserDetails = validateEditUserDetails(
+      req.email,
+      req.password,
+      req.repeatPassword
+    );
+
+    // Initialize the error and description variables, which will hold the errors.
+    let error = "Invalid details.";
+    const description = [];
+
+    // If the status of the validation is false, append the errors to the description and return Toast with the provided values.
+    if (!areValidEditUserDetails.status) {
+      areValidEditUserDetails.errors.forEach((e) => description.push(e));
+      return showToast(error, description.join(" "));
+    }
+
+    // Prepare the form data.
+    const formData = new FormData();
+    formData.append("currentUserId", currentUserId);
+    formData.append("editedUserId", userId);
+    formData.append("email", req.email);
+    formData.append("password", req.password);
+    formData.append("repeatPassword", req.repeatPassword);
+
+    // Make the request.
+    const requestSender = new RequestSender();
+    const result = await requestSender.post(`/user/${userId}/edit`, {
+      data: formData,
+    });
+
+    // Navigate to login on result success status.
+    if (result.status) {
+      return navigate(`/profile/${userId}`);
+    }
+
+    // Else show the errors.
+    result.errors.forEach((e) => description.push(e));
+    return showToast(error, description.join(" "));
   }
   return (
     <div>
