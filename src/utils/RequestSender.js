@@ -31,7 +31,6 @@ class RequestSender {
       : { method: "GET" };
     try {
       const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
-      console.log(this.token, this.headers, res);
       return options.returnRawResponse ? res : await res.json();
     } catch (e) {
       throw e;
