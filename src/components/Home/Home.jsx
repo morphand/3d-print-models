@@ -28,7 +28,7 @@ function Home() {
           <p>
             Upload your
             <br />
-            <span>STL/OBJ/3MF</span>
+            <span>.STL model</span>
             <br />
             <small>designs and share them with others!</small>
             <br />
