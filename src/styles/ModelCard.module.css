@@ -1,0 +1,39 @@
+.model {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.32rem;
+  border: 0.12rem solid hsl(204, 100%, 49%);
+  border-radius: 0.32rem;
+  width: 20%;
+  padding: 0.32rem;
+}
+
+.model-head {
+  border-bottom: 0.12rem solid hsl(204, 100%, 49%);
+  font-weight: bold;
+}
+
+.model-uploaded-by {
+  font-style: italic;
+}
+
+.model-image img {
+  width: 12rem;
+  height: 12rem;
+  padding: 0.32rem;
+  border-radius: 0.6rem;
+}
+
+.model-statistics {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.model-statistics > p > svg {
+  width: 1.32rem;
+  height: 1.32rem;
+}

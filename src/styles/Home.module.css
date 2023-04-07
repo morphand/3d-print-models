@@ -48,47 +48,7 @@ article[class="featured"] {
 
 .featured-models {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   gap: 1rem;
   width: 100%;
-}
-
-.featured-models div[class="model"] {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.32rem;
-  border: 0.12rem solid hsl(204, 100%, 49%);
-  border-radius: 0.32rem;
-  width: 25%;
-  padding: 0.32rem;
-}
-
-.featured-models div[class="model-head"] {
-  border-bottom: 0.12rem solid hsl(204, 100%, 49%);
-  font-weight: bold;
-}
-
-.featured-models div[class="model-uploaded-by"] {
-  font-style: italic;
-}
-
-.featured-models div[class="model-image"] img {
-  width: 12rem;
-  height: 12rem;
-  padding: 0.32rem;
-  border-radius: 0.6rem;
-}
-
-.featured-models div[class="model-statistics"] {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.32rem;
-}
-
-.featured-models div[class="model-statistics"] > p > svg {
-  width: 1.32rem;
-  height: 1.32rem;
 }
