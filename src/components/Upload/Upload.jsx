@@ -1,87 +1,93 @@
 import { useRef, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Form.module.css";
-import { validateImage } from "../../utils/validators";
-import Toast from "../Toast/Toast";
+import { validateImage, validateModelFilename } from "../../utils/validators";
 import AuthContext from "../../contexts/Auth";
+import ToastContext from "../../contexts/Toast";
+import RequestSender from "../../utils/RequestSender";
 
 function Upload() {
   const authContext = useContext(AuthContext);
   const userId = authContext.userId;
+  const toastContext = useContext(ToastContext);
+  const showToast = toastContext.showToast;
   const [filesSelected, setFilesSelected] = useState(null);
   const [images, setImages] = useState(null);
-  const [errors, setErrors] = useState(false);
-  const [modelCreated, setModelCreated] = useState(false);
+  const [errors, setErrors] = useState(true);
   const modelName = useRef();
   const modelDescription = useRef();
   const navigate = useNavigate();
+
   function handleImages(images) {
-    setErrors(false);
+    let hasInvalidImages = false;
+    let error = "Invalid file names.";
+    const description = [];
     [...images].forEach((image, i) => {
       if (!validateImage(image.name)) {
-        setErrors(true);
+        hasInvalidImages = true;
+        description.push(`${image.name} contains invalid file extension.`);
       }
     });
-    if (!errors) {
-      setImages(images);
+    if (hasInvalidImages) {
+      setErrors(true);
+      return showToast(error, description.join(" "));
     }
+    setErrors(false);
+    return setImages(images);
   }
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (userId) {
-      e.preventDefault();
-      const formData = new FormData();
 
-      // Set basic model info.
-      formData.append(
-        "modelInfo",
-        JSON.stringify({
-          creatorId: userId,
-          modelName: modelName.current.value,
-          modelDescription: modelDescription.current.value,
-        })
-      );
-
-      // Add the model files to the form data.
-      [...filesSelected].forEach((file, i) => {
-        formData.append(`file-${i}`, file, file.name);
-      });
-
-      // Add the images to the form data.
-      [...images].forEach((image, i) => {
-        formData.append(`image-${i}`, image, image.name);
-      });
-
-      // Send request.
-      if (!errors) {
-        fetch(`http://localhost:5000/api/user/${userId}/upload`, {
-          method: "POST",
-          body: formData,
-        })
-          .then((res) => res.json())
-          .then((res) => {
-            setModelCreated(true);
-            const modelId = res.value._id;
-            navigate(`/models/${modelId}`);
-          });
+  function handleFiles(files) {
+    let hasInvalidFiles = false;
+    let error = "Invalid file names.";
+    const description = [];
+    [...files].forEach((file, i) => {
+      if (!validateModelFilename(file.name)) {
+        hasInvalidFiles = true;
+        description.push(`${file.name} contains invalid file extension.`);
       }
+    });
+    if (hasInvalidFiles) {
+      setErrors(true);
+      return showToast(error, description.join(" "));
+    }
+    setErrors(false);
+    return setFilesSelected(files);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData();
+
+    // Set basic model info.
+    formData.append("creatorId", userId);
+    formData.append("modelName", modelName.current.value);
+    formData.append("modelDescription", modelDescription.current.value);
+
+    // Add the model files to the form data.
+    [...filesSelected].forEach((file, i) => {
+      formData.append(`file-${i}`, file, file.name);
+    });
+
+    // Add the images to the form data.
+    [...images].forEach((image, i) => {
+      formData.append(`image-${i}`, image, image.name);
+    });
+
+    // Send request.
+    if (!errors) {
+      const requestSender = new RequestSender();
+      const result = await requestSender.post(`/user/${userId}/upload`, {
+        data: formData,
+      });
+      const modelId = result.value._id;
+      showToast("Model created", `${result.value.name} created successfully.`);
+      navigate(`/models/${modelId}`);
     }
   }
+
   return (
     <div>
       <h3>Upload model</h3>
-      {errors && (
-        <Toast
-          header="Invalid files."
-          content="Some files contain invalid file extensions."
-        />
-      )}
-      {modelCreated && (
-        <Toast
-          header="Model created."
-          content="The model has been created successfully."
-        />
-      )}
       <form
         method="POST"
         encType="multipart/form-data"
@@ -109,19 +115,19 @@ function Upload() {
           maxLength="2000"
           placeholder="Describe your model here."
         ></textarea>
-        <label htmlFor="model">
-          Model files (allowed file formats: STL/OBJ/3MF)
-        </label>
+        <label htmlFor="model">Model files (allowed file formats: STL)</label>
         <input
           type="file"
           name="model"
           id="model"
           onChange={(e) => {
-            setFilesSelected(e.target.files);
+            handleFiles(e.target.files);
           }}
           required
         />
-        <label htmlFor="modelImages">Model images</label>
+        <label htmlFor="modelImages">
+          Model images (allowed file formats: JPG, JPEG, PNG, WEBP)
+        </label>
         <input
           type="file"
           name="modelImages"
@@ -130,7 +136,7 @@ function Upload() {
           onChange={(e) => handleImages(e.target.files)}
           required
         />
-        <input type="submit" value="Upload" />
+        <input type="submit" value="Upload" disabled={errors} />
       </form>
     </div>
   );
