@@ -10,6 +10,7 @@ function Footer() {
         <a
           href="https://github.com/morphand/softuni-reactjs-exam"
           target="_blank"
+          rel="noreferrer"
         >
           client
         </a>{" "}
@@ -17,6 +18,7 @@ function Footer() {
         <a
           href="https://github.com/morphand/softuni-reactjs-exam-server"
           target="_blank"
+          rel="noreferrer"
         >
           server
         </a>
