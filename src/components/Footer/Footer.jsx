@@ -5,7 +5,7 @@ function Footer() {
   return (
     <div className={styles["footer"]}>
       <small>
-        This project is made for the SoftUni ReactJS exam. Checkout the code for
+        This project is made for the SoftUni ReactJS exam. Check out the code for
         the <GitHubIcon />{" "}
         <a
           href="https://github.com/morphand/softuni-reactjs-exam"
