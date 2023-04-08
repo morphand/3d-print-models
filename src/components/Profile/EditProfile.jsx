@@ -1,4 +1,4 @@
-import { useRef, useState, useContext } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   PASSWORD_MIN_LENGTH,
@@ -9,6 +9,7 @@ import {
   REPEAT_PASSWORD_MAX_LENGTH,
   validatePassword,
   validateEmail,
+  validateImageURL,
   validateRepeatPassword,
   validateEditUserDetails,
 } from "../../utils/validators";
@@ -24,21 +25,38 @@ function EditProfile() {
   const toastContext = useContext(ToastContext);
   const showToast = toastContext.showToast;
   const email = useRef("");
+  const imageURL = useRef("");
   const password = useRef("");
   const repeatPassword = useRef("");
   const [isValidPassword, setIsValidPassword] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
+  const [isValidImageURL, setIsValidImageURL] = useState(false);
   const [isValidRepeatPassword, setIsValidRepeatPassword] = useState(false);
+  const [initialEmail, setInitialEmail] = useState("");
+  const [initialImageURL, setInitialImageURL] = useState("");
   const { userId } = useParams();
   const navigate = useNavigate();
-  if (currentUserId !== userId || !isUserAdmin) {
-    navigate(`/profile/${userId}`);
+  const requestSender = new RequestSender();
+
+  useEffect(() => {
+    if (currentUserId !== userId && !isUserAdmin) {
+      return navigate(`/profile/${userId}`);
+    }
+    getInitialValues();
+  }, [currentUserId, isUserAdmin, navigate, userId]);
+
+  async function getInitialValues() {
+    const result = await requestSender.get(`/user/${userId}/edit`);
+    setInitialEmail(result.email);
+    setInitialImageURL(result.imageURL);
   }
+
   async function handleSubmit(e) {
     e.preventDefault();
     // Get the request's email, password and repeatPassword from the form and trim them.
     const req = {
       email: email.current.value.trim(),
+      imageURL: imageURL.current.value.trim(),
       password: password.current.value.trim(),
       repeatPassword: repeatPassword.current.value.trim(),
     };
@@ -46,6 +64,7 @@ function EditProfile() {
     // Validate the provided username, email, password and repeatPassword.
     const areValidEditUserDetails = validateEditUserDetails(
       req.email,
+      req.imageURL,
       req.password,
       req.repeatPassword
     );
@@ -65,11 +84,11 @@ function EditProfile() {
     formData.append("currentUserId", currentUserId);
     formData.append("editedUserId", userId);
     formData.append("email", req.email);
+    formData.append("imageURL", req.imageURL);
     formData.append("password", req.password);
     formData.append("repeatPassword", req.repeatPassword);
 
     // Make the request.
-    const requestSender = new RequestSender();
     const result = await requestSender.post(`/user/${userId}/edit`, {
       data: formData,
     });
@@ -99,11 +118,31 @@ function EditProfile() {
               ? setIsValidEmail(true)
               : setIsValidEmail(false);
           }}
+          defaultValue={initialEmail}
           required
         />
         {!isValidEmail && (
           <p className={styles["error-text"]}>
             <small>Invalid email.</small>
+          </p>
+        )}
+        <label htmlFor="imageURL">Image URL</label>
+        <input
+          type="text"
+          name="imageURL"
+          id="imageURL"
+          ref={imageURL}
+          onChange={(e) => {
+            validateImageURL(e.target.value)
+              ? setIsValidImageURL(true)
+              : setIsValidImageURL(false);
+          }}
+          defaultValue={initialImageURL}
+          required
+        />
+        {!isValidImageURL && (
+          <p className={styles["error-text"]}>
+            <small>Invalid image URL.</small>
           </p>
         )}
         <label htmlFor="password">Password</label>
