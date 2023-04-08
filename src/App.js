@@ -48,7 +48,7 @@ function App() {
     }
   }, [decodedToken]);
 
-  function showToast(header, content) {
+  function showToast(header, content, hideAfterMs = 3000) {
     setToastHeader(header);
     setToastContent(content);
     setIsToastShown(true);
@@ -56,7 +56,7 @@ function App() {
       setIsToastShown(false);
       setToastHeader("");
       setToastContent("");
-    }, 3000);
+    }, hideAfterMs);
   }
 
   return (
