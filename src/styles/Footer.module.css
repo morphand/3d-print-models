@@ -2,3 +2,8 @@
   padding: 0.32rem;
   background: hsl(0, 0%, 96%);
 }
+
+.footer svg {
+  width: 1rem;
+  height: 1rem;
+}
