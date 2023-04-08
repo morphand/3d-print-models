@@ -83,6 +83,19 @@ export function validateRepeatPassword(password, repeatPassword) {
 }
 
 /**
+ * @param {String} imageURL
+ * @returns {Boolean}
+ */
+export function validateImageURL(imageURL) {
+  imageURL = imageURL.trim();
+  const regex = new RegExp(/^https?:\/\/.+\..+/, "i");
+  if (!imageURL || !regex.test(imageURL)) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * @param {String} username
  * @param {String} password
  * @returns {ValidationResult}
@@ -128,18 +141,22 @@ export function validateLoginDetails(username, password) {
 export function validateRegisterDetails(
   username,
   email,
+  imageURL,
   password,
   repeatPassword
 ) {
   const result = new ValidationResult();
 
   // If some fields are empty, push errors and return the result.
-  if (!username || !email || !password || !repeatPassword) {
+  if (!username || !email || !imageURL || !password || !repeatPassword) {
     if (!username) {
       result.errors.push(`No username provided.`);
     }
     if (!email) {
       result.errors.push(`No email provided.`);
+    }
+    if (!imageURL) {
+      result.errors.push(`No image URL provided.`);
     }
     if (!password) {
       result.errors.push(`No password provided.`);
@@ -153,6 +170,7 @@ export function validateRegisterDetails(
   // Validation.
   const isValidUsername = validateUsername(username.trim());
   const isValidEmail = validateEmail(email.trim());
+  const isValidImageURL = validateImageURL(imageURL.trim());
   const isValidPassword = validatePassword(password.trim());
   const isValidRepeatPassword = validateRepeatPassword(
     password.trim(),
@@ -163,6 +181,7 @@ export function validateRegisterDetails(
   if (
     !isValidUsername ||
     !isValidEmail ||
+    !isValidImageURL ||
     !isValidPassword ||
     !isValidRepeatPassword
   ) {
@@ -174,6 +193,11 @@ export function validateRegisterDetails(
     if (!isValidEmail) {
       result.errors.push(
         `The length of the email has to be atleast ${EMAIL_MIN_LENGTH} characters long and match the pattern **@**.**.`
+      );
+    }
+    if (!isValidImageURL) {
+      result.errors.push(
+        `The image URL has to start with http:// or https:// and contain a hostname and domain.`
       );
     }
     if (!isValidPassword) {
@@ -192,13 +216,21 @@ export function validateRegisterDetails(
   return result;
 }
 
-export function validateEditUserDetails(email, password, repeatPassword) {
+export function validateEditUserDetails(
+  email,
+  imageURL,
+  password,
+  repeatPassword
+) {
   const result = new ValidationResult();
 
   // If some fields are empty, push errors and return the result.
-  if (!email || !password || !repeatPassword) {
+  if (!email || !imageURL || !password || !repeatPassword) {
     if (!email) {
       result.errors.push(`No email provided.`);
+    }
+    if (!imageURL) {
+      result.errors.push(`No imageURL provided.`);
     }
     if (!password) {
       result.errors.push(`No password provided.`);
@@ -211,6 +243,7 @@ export function validateEditUserDetails(email, password, repeatPassword) {
 
   // Validation.
   const isValidEmail = validateEmail(email.trim());
+  const isValidImageURL = validateImageURL(imageURL.trim());
   const isValidPassword = validatePassword(password.trim());
   const isValidRepeatPassword = validateRepeatPassword(
     password.trim(),
@@ -218,10 +251,20 @@ export function validateEditUserDetails(email, password, repeatPassword) {
   );
 
   // If some fields are invalid, push errors and return the result.
-  if (!isValidEmail || !isValidPassword || !isValidRepeatPassword) {
+  if (
+    !isValidEmail ||
+    !isValidImageURL ||
+    !isValidPassword ||
+    !isValidRepeatPassword
+  ) {
     if (!isValidEmail) {
       result.errors.push(
         `The length of the email has to be atleast ${EMAIL_MIN_LENGTH} characters long and match the pattern **@**.**.`
+      );
+    }
+    if (!isValidImageURL) {
+      result.errors.push(
+        `The image URL has to start with http:// or https:// and contain a hostname and domain.`
       );
     }
     if (!isValidPassword) {
