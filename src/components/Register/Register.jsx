@@ -14,6 +14,7 @@ import {
   validateEmail,
   validateRepeatPassword,
   validateRegisterDetails,
+  validateImageURL,
 } from "../../utils/validators";
 import styles from "../../styles/Form.module.css";
 import RequestSender from "../../utils/RequestSender";
@@ -24,11 +25,13 @@ function Register() {
   const email = useRef("");
   const password = useRef("");
   const repeatPassword = useRef("");
+  const imageURL = useRef("");
   const toastContext = useContext(ToastContext);
   const showToast = toastContext.showToast;
   const [isValidUsername, setIsValidUsername] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
+  const [isValidImageURL, setIsValidImageURL] = useState(false);
   const [isValidRepeatPassword, setIsValidRepeatPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -38,6 +41,7 @@ function Register() {
     const req = {
       username: username.current.value.trim(),
       email: email.current.value.trim(),
+      imageURL: imageURL.current.value.trim(),
       password: password.current.value.trim(),
       repeatPassword: repeatPassword.current.value.trim(),
     };
@@ -46,6 +50,7 @@ function Register() {
     const areValidRegisterDetails = validateRegisterDetails(
       req.username,
       req.email,
+      req.imageURL,
       req.password,
       req.repeatPassword
     );
@@ -64,6 +69,7 @@ function Register() {
     const formData = new FormData();
     formData.append("username", req.username);
     formData.append("email", req.email);
+    formData.append("imageURL", req.imageURL);
     formData.append("password", req.password);
     formData.append("repeatPassword", req.repeatPassword);
 
@@ -104,6 +110,24 @@ function Register() {
             <small>
               Username should be atleast {USERNAME_MIN_LENGTH} characters long.
             </small>
+          </p>
+        )}
+        <label htmlFor="imageURL">Image URL</label>
+        <input
+          type="text"
+          name="imageURL"
+          id="imageURL"
+          ref={imageURL}
+          onChange={(e) => {
+            validateImageURL(e.target.value)
+              ? setIsValidImageURL(true)
+              : setIsValidImageURL(false);
+          }}
+          required
+        />
+        {!isValidImageURL && (
+          <p className={styles["error-text"]}>
+            <small>Invalid image URL.</small>
           </p>
         )}
         <label htmlFor="email">Email</label>
