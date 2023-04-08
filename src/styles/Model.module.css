@@ -50,10 +50,16 @@
   align-items: center;
   gap: 1rem;
   overflow-wrap: break-word;
-  font-weight: bold;}
+  font-weight: bold;
+}
 
 .model-name h2 {
   overflow-wrap: break-word;
+}
+
+.model-uploaded-modified-at {
+  display: flex;
+  flex-direction: column;
 }
 
 .model-description p {

@@ -18,6 +18,7 @@ import FeatureButton from "./Buttons/FeatureButton";
 import RemoveFeatureButton from "./Buttons/RemoveFeatureButton";
 import DeleteModelButton from "./Buttons/DeleteModelButton";
 import EditModelButton from "./Buttons/EditModelButton";
+import { dateFormatter } from "../../utils/formatters";
 
 function Model() {
   const authContext = useContext(AuthContext);
@@ -29,6 +30,8 @@ function Model() {
   const [model, setModel] = useState(null);
   const [modelComments, setModelComments] = useState([]);
   const [isFeaturedModel, setIsFeaturedModel] = useState(false);
+  const [modelDateUploaded, setModelDateUploaded] = useState(null);
+  const [modelDateLastModified, setmodelDateLastModified] = useState(null);
   const [modelLikes, setModelLikes] = useState(0);
   const [modelCommentsCount, setModelCommentsCount] = useState(0);
   const [modelDownloadsCount, setModelDownloadsCount] = useState(0);
@@ -57,9 +60,12 @@ function Model() {
         setIsFeaturedModel(res.isFeatured);
         setModelCommentsCount(res.comments.length);
         setModelDownloadsCount(res.downloadsCount);
+        setModelDateUploaded(res.dateUploaded);
+        setmodelDateLastModified(res.dateLastModified);
       })
       .catch((e) => console.log(e));
   }, [modelId, userId]);
+
   async function handleDownloadModel() {
     fetch(model.files[0])
       .then((res) => {
@@ -231,7 +237,7 @@ function Model() {
                     Uploaded by{" "}
                     <Link to={`/profile/${model.creator._id}`}>
                       {model.creator.username}
-                    </Link>
+                    </Link>{" "}
                   </small>
                 </div>
               </div>
@@ -245,6 +251,14 @@ function Model() {
               <div className={styles["model-description"]}>
                 <h3>Description</h3>
                 <p>{model.description}</p>
+              </div>
+              <div className={styles["model-uploaded-modified-at"]}>
+                <small>Uploaded at {dateFormatter(modelDateUploaded)}</small>
+                {modelDateLastModified && (
+                  <small>
+                    Modified at {dateFormatter(modelDateLastModified)}
+                  </small>
+                )}
               </div>
               <ModelStatistics
                 downloadsCount={modelDownloadsCount}
