@@ -1,9 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { StlViewer } from "react-stl-viewer";
 import ModelCard from "../Model/ModelCard";
 import styles from "../../styles/Home.module.css";
 import AuthContext from "../../contexts/Auth";
+import RequestSender from "../../utils/RequestSender";
 
 function Home() {
   const [featuredModels, setFeaturedModels] = useState([]);
@@ -14,13 +15,16 @@ function Home() {
     width: "100%",
     height: "100%",
   };
-  useEffect(() => {
-    fetch("http://localhost:5000/api/featuredModels")
-      .then((res) => res.json())
-      .then((res) => setFeaturedModels(res))
-      .catch((e) => console.log(e));
+  const getFeaturedModels = useCallback(async () => {
+    const requestSender = new RequestSender();
+    const result = await requestSender.get(`/featuredModels`);
+    setFeaturedModels(result);
   }, []);
-  console.log(featuredModels);
+
+  useEffect(() => {
+    getFeaturedModels();
+  }, [getFeaturedModels]);
+
   return (
     <>
       <article className={styles["hero"]}>
