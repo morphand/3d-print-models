@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import ModelCard from "../Model/ModelCard";
-import { LikesIcon, UploadIcon, UserIcon } from "../Icons/Icons";
+import { LikesIcon, UploadIcon } from "../Icons/Icons";
 import styles from "../../styles/Profile.module.css";
 import { numberFormatter } from "../../utils/formatters";
 import AuthContext from "../../contexts/Auth";
@@ -16,9 +16,12 @@ function Profile() {
   const [imageURL, setImageURL] = useState("");
   const [uploadedModels, setUploadedModels] = useState([]);
   const [likedModels, setLikedModels] = useState([]);
-  const [subscribers, setSubscribers] = useState([]);
   const userId = useParams().userId;
-  const requestSender = new RequestSender();
+  const getUserModels = useCallback(async () => {
+    const requestSender = new RequestSender();
+    const result = await requestSender.get(`/user/${userId}/models`);
+    setUploadedModels(result);
+  }, [userId]);
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/user/${userId}`)
@@ -28,16 +31,10 @@ function Profile() {
         setUsername(res.username);
         setImageURL(res.imageURL);
         setLikedModels(res.likedModels);
-        setSubscribers(res.subscribers);
-        getUserModels();
+        getUserModels();  
       })
       .catch((e) => console.log(e.message));
-  }, [userId]);
-
-  async function getUserModels() {
-    const result = await requestSender.get(`/user/${userId}/models`);
-    setUploadedModels(result);
-  }
+  }, [userId, getUserModels]);
 
   return (
     user && (
@@ -73,17 +70,11 @@ function Profile() {
                   <span>{numberFormatter(likedModels.length)}</span>
                 </p>
               </div>
-              <div className="profile-subscribers-count">
-                <p>
-                  <UserIcon />
-                  <span>{numberFormatter(subscribers.length)}</span>
-                </p>
-              </div>
             </div>
           </div>
         </div>
         <div className={styles["model-list"]}>
-          {uploadedModels.length &&
+          {uploadedModels.length > 0 &&
             uploadedModels.map((model) => (
               <ModelCard key={model._id} model={model} />
             ))}

@@ -47,25 +47,29 @@ function Login() {
       return showToast(error, description.join(" "));
     }
 
-    // Prepare the form data.
-    const formData = new FormData();
-    formData.append("username", req.username);
-    formData.append("password", req.password);
+    try {
+      // Prepare the form data.
+      const formData = new FormData();
+      formData.append("username", req.username);
+      formData.append("password", req.password);
 
-    // Make the request.
-    const requestSender = new RequestSender();
-    const result = await requestSender.post(`/login`, { data: formData });
+      // Make the request.
+      const requestSender = new RequestSender();
+      const result = await requestSender.post(`/login`, { data: formData });
 
-    // Set token on result success status.
-    if (result.status) {
-      localStorage.setItem("auth", result.value.token);
-      setToken(result.value.token);
-      return navigate("/");
+      // Set token on result success status.
+      if (result.status) {
+        localStorage.setItem("auth", result.value.token);
+        setToken(result.value.token);
+        return navigate("/");
+      }
+
+      // Else show the errors.
+      result.errors.forEach((e) => description.push(e));
+      return showToast(error, description.join(" "));
+    } catch (e) {
+      showToast("Error.", e.message);
     }
-
-    // Else show the errors.
-    result.errors.forEach((e) => description.push(e));
-    return showToast(error, description.join(" "));
   }
 
   return (
