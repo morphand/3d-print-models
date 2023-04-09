@@ -1,7 +1,14 @@
 import { useRef, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/Form.module.css";
-import { validateImage, validateModelFilename } from "../../utils/validators";
+import {
+  MODEL_NAME_MIN_LENGTH,
+  validateModelName,
+  validateModelDescription,
+  validateImage,
+  validateModelFilename,
+  MODEL_DESCRIPTION_MAX_LENGTH,
+} from "../../utils/validators";
 import AuthContext from "../../contexts/Auth";
 import ToastContext from "../../contexts/Toast";
 import RequestSender from "../../utils/RequestSender";
@@ -14,9 +21,13 @@ function Upload() {
   const [filesSelected, setFilesSelected] = useState(null);
   const [images, setImages] = useState(null);
   const [errors, setErrors] = useState(true);
+  const [isValidModelName, setIsValidModelName] = useState(false);
+  const [isValidModelDescription, setIsValidModelDescription] = useState(true);
   const modelName = useRef();
   const modelDescription = useRef();
   const navigate = useNavigate();
+  const isUploadButtonDisabled =
+    errors || !images || !filesSelected || !isValidModelName;
 
   function handleImages(images) {
     let hasInvalidImages = false;
@@ -103,9 +114,22 @@ function Upload() {
           minLength="2"
           maxLength="45"
           placeholder="The name of your model."
+          onChange={(e) => {
+            validateModelName(e.target.value)
+              ? setIsValidModelName(true)
+              : setIsValidModelName(false);
+          }}
           required
         />
-        <label htmlFor="modelDescription">Description</label>
+        {!isValidModelName && (
+          <p className={styles["error-text"]}>
+            <small>
+              The model name should be atleast {MODEL_NAME_MIN_LENGTH}{" "}
+              characters long.
+            </small>
+          </p>
+        )}
+        <label htmlFor="modelDescription">Description <small>(optional)</small></label>
         <textarea
           name="modelDescription"
           id="modelDescription"
@@ -114,7 +138,20 @@ function Upload() {
           rows="10"
           maxLength="2000"
           placeholder="Describe your model here."
+          onChange={(e) => {
+            validateModelDescription(e.target.value)
+              ? setIsValidModelDescription(true)
+              : setIsValidModelDescription(false);
+          }}
         ></textarea>
+        {!isValidModelDescription && (
+          <p className={styles["error-text"]}>
+            <small>
+              The model name should be no more than{" "}
+              {MODEL_DESCRIPTION_MAX_LENGTH} characters long.
+            </small>
+          </p>
+        )}
         <label htmlFor="model">Model files (allowed file formats: STL)</label>
         <input
           type="file"
@@ -125,6 +162,11 @@ function Upload() {
           }}
           required
         />
+        {!filesSelected && (
+          <p className={styles["error-text"]}>
+            <small>No file selected.</small>
+          </p>
+        )}
         <label htmlFor="modelImages">
           Model images (allowed file formats: JPG, JPEG, PNG, WEBP)
         </label>
@@ -136,7 +178,12 @@ function Upload() {
           onChange={(e) => handleImages(e.target.files)}
           required
         />
-        <input type="submit" value="Upload" disabled={errors} />
+        {!images && (
+          <p className={styles["error-text"]}>
+            <small>No image selected.</small>
+          </p>
+        )}
+        <input type="submit" value="Upload" disabled={isUploadButtonDisabled} />
       </form>
     </div>
   );

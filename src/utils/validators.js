@@ -306,8 +306,6 @@ export function validateModelName(modelName) {
 export function validateModelDescription(modelDescription) {
   modelDescription = modelDescription.trim();
   if (
-    !modelDescription ||
-    modelDescription.length < MODEL_DESCRIPTION_MIN_LENGTH ||
     modelDescription.length > MODEL_DESCRIPTION_MAX_LENGTH
   ) {
     return false;
