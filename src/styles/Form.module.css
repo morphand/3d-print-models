@@ -32,6 +32,11 @@
   background: hsl(204, 100%, 38%);
 }
 
+.form > input[type="submit"]:disabled {
+  cursor: auto;
+  background: lightgray;
+}
+
 .error-text {
   font-weight: normal;
   color: red;
