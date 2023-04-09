@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import ModelCard from "../Model/ModelCard";
 import Search from "../Search/Search";
@@ -12,13 +12,15 @@ function Catalog() {
   const searchTerm = useRef("");
   const authContext = useContext(AuthContext);
   const isUserLoggedIn = authContext.isUserLoggedIn;
+  const getModels = useCallback(async () => {
+    const requestSender = new RequestSender();
+    const result = await requestSender.get("/catalog");
+    setModels(result);
+  }, []);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/catalog")
-      .then((res) => res.json())
-      .then((res) => setModels(res))
-      .catch((e) => console.log(e));
-  }, []);
+    getModels();
+  }, [getModels]);
 
   async function handleSearch(e) {
     e.preventDefault();
