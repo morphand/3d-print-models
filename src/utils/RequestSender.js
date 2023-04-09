@@ -29,12 +29,12 @@ class RequestSender {
     const requestParams = this.token
       ? { method: "GET", headers }
       : { method: "GET" };
-    try {
-      const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
-      return options.returnRawResponse ? res : await res.json();
-    } catch (e) {
-      throw e;
+
+    const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
+    if (!res.ok) {
+      throw new Error(res.status);
     }
+    return options.returnRawResponse ? res : await res.json();
   }
 
   /**
@@ -54,12 +54,12 @@ class RequestSender {
     if (options.data) {
       requestParams.body = options.data;
     }
-    try {
-      const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
-      return options.returnRawResponse ? res : await res.json();
-    } catch (e) {
-      throw e;
+
+    const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
+    if (!res.ok) {
+      throw new Error(res.status);
     }
+    return options.returnRawResponse ? res : await res.json();
   }
 
   /**
@@ -79,12 +79,12 @@ class RequestSender {
     if (options.data) {
       requestParams.body = options.data;
     }
-    try {
-      const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
-      return options.returnRawResponse ? res : await res.json();
-    } catch (e) {
-      throw e;
+
+    const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
+    if (!res.ok) {
+      throw new Error(res.status);
     }
+    return options.returnRawResponse ? res : await res.json();
   }
 
   /**
@@ -104,12 +104,12 @@ class RequestSender {
     if (options.data) {
       requestParams.body = options.data;
     }
-    try {
-      const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
-      return options.returnRawResponse ? res : await res.json();
-    } catch (e) {
-      throw e;
+
+    const res = await fetch(`${this.baseURL}${endpoint}`, requestParams);
+    if (!res.ok) {
+      throw new Error(res.status);
     }
+    return options.returnRawResponse ? res : await res.json();
   }
 }
 
