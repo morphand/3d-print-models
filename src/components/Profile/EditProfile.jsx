@@ -1,4 +1,4 @@
-import { useRef, useState, useContext, useEffect } from "react";
+import { useRef, useState, useContext, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   PASSWORD_MIN_LENGTH,
@@ -29,27 +29,26 @@ function EditProfile() {
   const password = useRef("");
   const repeatPassword = useRef("");
   const [isValidPassword, setIsValidPassword] = useState(false);
-  const [isValidEmail, setIsValidEmail] = useState(false);
-  const [isValidImageURL, setIsValidImageURL] = useState(false);
+  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [isValidImageURL, setIsValidImageURL] = useState(true);
   const [isValidRepeatPassword, setIsValidRepeatPassword] = useState(false);
   const [initialEmail, setInitialEmail] = useState("");
   const [initialImageURL, setInitialImageURL] = useState("");
   const { userId } = useParams();
   const navigate = useNavigate();
-  const requestSender = new RequestSender();
+  const getInitialValues = useCallback(async () => {
+    const requestSender = new RequestSender();
+    const result = await requestSender.get(`/user/${userId}/edit`);
+    setInitialEmail(result.email);
+    setInitialImageURL(result.imageURL);
+  }, [userId]);
 
   useEffect(() => {
     if (currentUserId !== userId && !isUserAdmin) {
       return navigate(`/profile/${userId}`);
     }
     getInitialValues();
-  }, [currentUserId, isUserAdmin, navigate, userId]);
-
-  async function getInitialValues() {
-    const result = await requestSender.get(`/user/${userId}/edit`);
-    setInitialEmail(result.email);
-    setInitialImageURL(result.imageURL);
-  }
+  }, [currentUserId, isUserAdmin, navigate, userId, getInitialValues]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -79,28 +78,33 @@ function EditProfile() {
       return showToast(error, description.join(" "));
     }
 
-    // Prepare the form data.
-    const formData = new FormData();
-    formData.append("currentUserId", currentUserId);
-    formData.append("editedUserId", userId);
-    formData.append("email", req.email);
-    formData.append("imageURL", req.imageURL);
-    formData.append("password", req.password);
-    formData.append("repeatPassword", req.repeatPassword);
+    try {
+      // Prepare the form data.
+      const formData = new FormData();
+      formData.append("currentUserId", currentUserId);
+      formData.append("editedUserId", userId);
+      formData.append("email", req.email);
+      formData.append("imageURL", req.imageURL);
+      formData.append("password", req.password);
+      formData.append("repeatPassword", req.repeatPassword);
 
-    // Make the request.
-    const result = await requestSender.post(`/user/${userId}/edit`, {
-      data: formData,
-    });
+      // Make the request.
+      const requestSender = new RequestSender();
+      const result = await requestSender.post(`/user/${userId}/edit`, {
+        data: formData,
+      });
 
-    // Navigate to login on result success status.
-    if (result.status) {
-      return navigate(`/profile/${userId}`);
+      // Navigate to login on result success status.
+      if (result.status) {
+        return navigate(`/profile/${userId}`);
+      }
+
+      // Else show the errors.
+      result.errors.forEach((e) => description.push(e));
+      return showToast(error, description.join(" "));
+    } catch (e) {
+      showToast("Error.", e.message);
     }
-
-    // Else show the errors.
-    result.errors.forEach((e) => description.push(e));
-    return showToast(error, description.join(" "));
   }
   return (
     <div>
