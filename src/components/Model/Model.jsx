@@ -19,6 +19,7 @@ import RemoveFeatureButton from "./Buttons/RemoveFeatureButton";
 import DeleteModelButton from "./Buttons/DeleteModelButton";
 import EditModelButton from "./Buttons/EditModelButton";
 import { dateFormatter } from "../../utils/formatters";
+import ToastContext from "../../contexts/Toast";
 
 function Model() {
   const authContext = useContext(AuthContext);
@@ -26,6 +27,8 @@ function Model() {
   const username = authContext.username;
   const isUserLoggedIn = authContext.isUserLoggedIn;
   const isUserAdmin = authContext.isUserAdmin;
+  const toastContext = useContext(ToastContext);
+  const showToast = toastContext.showToast;
   const modelId = useParams().id;
   const [model, setModel] = useState(null);
   const [modelComments, setModelComments] = useState([]);
@@ -97,80 +100,102 @@ function Model() {
     setMainImage("");
   }
   async function handleLikeModel() {
-    await requestSender.post(`/models/${modelId}/like/add`);
-    setModelLikes((likes) => likes + 1);
-    setUserLikedModel(true);
+    try {
+      await requestSender.post(`/models/${modelId}/like/add`);
+      setModelLikes((likes) => likes + 1);
+      setUserLikedModel(true);
+    } catch (e) {
+      showToast("Error.", e.message);
+    }
   }
   async function handleDislikeModel() {
-    await requestSender.post(`/models/${modelId}/like/remove`);
-    setModelLikes((likes) => likes - 1);
-    setUserLikedModel(false);
+    try {
+      await requestSender.post(`/models/${modelId}/like/remove`);
+      setModelLikes((likes) => likes - 1);
+      setUserLikedModel(false);
+    } catch (e) {
+      showToast("Error.", e.message);
+    }
   }
   async function handleDeleteModel() {
     const confirmModelDelete = prompt(
       `Are you sure you want to delete this model? Enter "${model.name}" to confirm.`
     );
     if (confirmModelDelete === model.name) {
-      const result = await requestSender.delete(`/models/${modelId}`);
-      if (result.status) {
-        navigate("/models");
-      } else {
-        // Show toast
-        console.log(result);
-        console.log(result.errors);
+      try {
+        const result = await requestSender.delete(`/models/${modelId}`);
+        if (result.status) {
+          navigate("/models");
+        }
+      } catch (e) {
+        showToast("Error.", e.message);
       }
     }
   }
   async function handleFeatureModel() {
-    const result = await requestSender.post(`/models/${modelId}/feature/add`);
-    if (result.status) {
-      setIsFeaturedModel(true);
-    } else {
-      // Show toast
-      console.log(result.errors);
+    try {
+      const result = await requestSender.post(`/models/${modelId}/feature/add`);
+      if (result.status) {
+        setIsFeaturedModel(true);
+      }
+    } catch (e) {
+      showToast("Error.", e.message);
     }
   }
   async function handleRemoveFeatureModel() {
-    const result = await requestSender.post(
-      `/models/${modelId}/feature/remove`
-    );
-    if (result.status) {
-      setIsFeaturedModel(false);
-    } else {
-      // Show toast
-      console.log(result.errors);
+    try {
+      const result = await requestSender.post(
+        `/models/${modelId}/feature/remove`
+      );
+      if (result.status) {
+        setIsFeaturedModel(false);
+      }
+    } catch (e) {
+      showToast("Error.", e.message);
     }
   }
   function scrollToComments() {
     comment.current.scrollIntoView({ behavior: "smooth" });
   }
   async function getModelComments() {
-    const res = await requestSender.get(`/models/${modelId}/comments`);
-    setModelComments(res.comments);
+    try {
+      const res = await requestSender.get(`/models/${modelId}/comments`);
+      setModelComments(res.comments);
+    } catch (e) {
+      showToast("Error.", e.message);
+    }
   }
   async function handleAddComment(e) {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("comment", comment.current.value.trim());
-    formData.append("creatorUsername", username);
-    await requestSender.post(`/models/${modelId}/comments`, {
-      data: formData,
-    });
-    getModelComments();
-    setModelCommentsCount((commentsCount) => commentsCount + 1);
-    comment.current.value = "";
+    try {
+      const formData = new FormData();
+      formData.append("comment", comment.current.value.trim());
+      formData.append("creatorUsername", username);
+      await requestSender.post(`/models/${modelId}/comments`, {
+        data: formData,
+      });
+      getModelComments();
+      setModelCommentsCount((commentsCount) => commentsCount + 1);
+      comment.current.value = "";
+    } catch (e) {
+      showToast("Error.", e.message);
+    }
   }
   async function handleDeleteComment(e, comment) {
-    const commentId = comment._id;
-    const formData = new FormData();
-    formData.append("commentId", commentId);
-    await requestSender.delete(`/models/${modelId}/comments`, {
-      data: formData,
-    });
-    getModelComments();
-    setModelCommentsCount((commentsCount) => commentsCount - 1);
+    try {
+      const commentId = comment._id;
+      const formData = new FormData();
+      formData.append("commentId", commentId);
+      await requestSender.delete(`/models/${modelId}/comments`, {
+        data: formData,
+      });
+      getModelComments();
+      setModelCommentsCount((commentsCount) => commentsCount - 1);
+    } catch (e) {
+      showToast("Error.", e.message);
+    }
   }
-  // console.log(model);
+
   return (
     <>
       {model ? (
